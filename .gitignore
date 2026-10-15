@@ -1,0 +1,11 @@
+.DS_Store
+Thumbs.db
+.vscode/
+node_modules/
+*.log
+.env
+
+# Originali delle immagini (pesanti): nel sito si usano le versioni ottimizzate in assets/img/
+/Gemini_Generated_Image_*.jpg
+/italian hand.jpg
+*.textClipping

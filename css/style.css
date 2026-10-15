@@ -1,0 +1,273 @@
+/* =========================================================
+   Max & Alice · Lerici 2027 — stile "Limoni"
+   I colori e i font principali sono tutti qui sotto in :root
+   ========================================================= */
+
+:root {
+  --cream: #FBF7EE;      /* sfondo */
+  --sand: #F3EBD7;       /* sezione "Programma" */
+  --line: #D9CBA6;       /* bordi delle schede */
+  --field: #B9A982;      /* bordi dei campi del modulo */
+  --navy: #1F3A5F;       /* testo e pulsanti */
+  --navy-dark: #132640;  /* hover */
+  --navy-soft: #4A5D78;  /* testo secondario */
+  --lemon: #E8B931;      /* accento (sole, linee) */
+  --lemon-soft: #FBF0C9; /* sfondo messaggi */
+  --error: #A3321F;
+
+  --serif: 'Cormorant Garamond', Georgia, serif;
+  --sans: 'Jost', system-ui, sans-serif;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+body {
+  margin: 0;
+  background: var(--cream);
+  color: var(--navy);
+  font-family: var(--sans);
+  font-size: 17px;
+  line-height: 1.65;
+}
+
+a { color: var(--navy); }
+a:hover { color: var(--navy-dark); }
+img { max-width: 100%; height: auto; display: block; }
+input, textarea, button { font: inherit; }
+:focus-visible { outline: 2px solid var(--navy); outline-offset: 2px; }
+[hidden] { display: none !important; }
+
+.wrap { max-width: 1120px; margin: 0 auto; padding: 0 24px; }
+
+h1, h2, h3 { font-family: var(--serif); font-weight: 400; margin: 0; }
+h2 { font-size: 52px; line-height: 1.1; }
+
+/* ---------- Header ---------- */
+.top {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
+  gap: 16px; padding-top: 24px; padding-bottom: 24px;
+  position: relative; z-index: 2;
+}
+.mono { font-family: var(--serif); font-size: 26px; font-style: italic; text-decoration: none; }
+nav { display: flex; flex-wrap: wrap; align-items: center; gap: 28px; font-size: 15px; }
+nav a { text-decoration: none; }
+
+.langs { display: flex; gap: 4px; }
+.langs button {
+  min-width: 44px; height: 44px;
+  border: 1px solid transparent; background: transparent; color: var(--navy);
+  border-radius: 22px; font-weight: 500; font-size: 13px; letter-spacing: .08em; cursor: pointer;
+}
+.langs button[aria-pressed="true"] { border-color: var(--navy); background: var(--navy); color: var(--cream); }
+
+/* ---------- Hero ----------
+   ACQUERELLO DI LERICI: l'immagine è assets/img/lerici-golfo.jpg.
+   Per cambiarla basta sostituire il file (stesso nome) o il percorso qui sotto.
+   La trasparenza si regola con "opacity" (0.25–0.35 consigliato).
+*/
+.hero { position: relative; overflow: hidden; }
+.hero::before {
+  content: "";
+  position: absolute; inset: 0; z-index: 0;
+  opacity: .3;
+  background-image: url("../assets/img/lerici-golfo.jpg");
+  background-size: cover;
+  background-position: center 40%;
+  -webkit-mask-image: linear-gradient(to bottom, #000 50%, transparent 100%);
+          mask-image: linear-gradient(to bottom, #000 50%, transparent 100%);
+}
+.hero-inner {
+  position: relative; z-index: 1;
+  padding-top: 56px; padding-bottom: 96px;
+  display: flex; flex-direction: column; align-items: center; text-align: center; gap: 20px;
+}
+.kicker { font-size: 14px; letter-spacing: .24em; text-transform: uppercase; font-weight: 500; }
+.names { font-style: italic; font-size: clamp(64px, 11vw, 132px); line-height: 1; }
+.date { font-family: var(--serif); font-size: 30px; font-weight: 500; }
+.place { font-size: 15px; letter-spacing: .16em; text-transform: uppercase; font-weight: 500; }
+.intro { max-width: 560px; margin: 16px 0 0; }
+
+.btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-height: 48px; padding: 0 32px;
+  background: var(--navy); color: var(--cream);
+  border: 1px solid var(--navy); border-radius: 24px;
+  text-decoration: none; font-weight: 500; letter-spacing: .04em; cursor: pointer;
+}
+.btn:hover { background: var(--navy-dark); color: var(--cream); }
+.btn:disabled { opacity: .6; cursor: progress; }
+.btn-wide { min-height: 52px; border-radius: 26px; }
+.btn-ghost { background: transparent; color: var(--navy); }
+.btn-ghost:hover { background: var(--sand); color: var(--navy); }
+
+/* ---------- Programma ---------- */
+.day { background: var(--sand); padding: 88px 0; }
+.day h2 { text-align: center; margin-bottom: 40px; }
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; }
+.card {
+  background: var(--cream); border: 1px solid var(--line); border-radius: 4px;
+  overflow: hidden; display: flex; flex-direction: column;
+}
+.card img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; }
+.card-body { padding: 28px 32px 32px; display: flex; flex-direction: column; gap: 8px; }
+.card-day { font-size: 13px; letter-spacing: .16em; text-transform: uppercase; font-weight: 500; color: var(--navy-soft); }
+.card .title { font-style: italic; font-size: 34px; line-height: 1.15; }
+
+.facts { margin: 4px 0 0; display: grid; gap: 2px; }
+.facts div { display: flex; flex-wrap: wrap; gap: 0 8px; }
+.facts dt { font-weight: 500; }
+.facts dt::after { content: ":"; }
+.facts dd { margin: 0; }
+.map-link { font-size: 15px; font-weight: 500; align-self: flex-start; padding: 10px 0; }
+
+/* ---------- Viaggio ---------- */
+.travel {
+  max-width: 760px; padding-top: 88px; padding-bottom: 88px;
+  text-align: center; display: flex; flex-direction: column; align-items: center; gap: 16px;
+}
+.travel p { margin: 0; }
+.rule { width: 48px; height: 2px; background: var(--lemon); margin-top: 8px; }
+
+/* ---------- RSVP: contenitore ---------- */
+.rsvp { background: var(--navy); padding: 88px 24px; }
+.panel {
+  max-width: 680px; margin: 0 auto; background: var(--cream); border-radius: 8px;
+  overflow: hidden; scroll-margin-top: 16px;
+}
+.panel-cover { width: 100%; aspect-ratio: 16 / 7; object-fit: cover; }
+.panel-inner { padding: 40px 40px 48px; }
+.panel-head { text-align: center; margin-bottom: 24px; }
+.panel-head p { margin: 4px 0 0; color: var(--navy-soft); }
+
+.stack { display: flex; flex-direction: column; gap: 20px; }
+.field { display: flex; flex-direction: column; gap: 6px; }
+.field label { font-size: 15px; font-weight: 500; }
+.field input, .field textarea {
+  min-height: 48px; padding: 0 14px;
+  border: 1px solid var(--field); border-radius: 4px;
+  background: #fff; color: var(--navy);
+}
+.field textarea { padding: 12px 14px; resize: vertical; }
+.field input:focus, .field textarea:focus { outline: 2px solid var(--navy); outline-offset: 1px; }
+#code { font-size: 20px; letter-spacing: .12em; text-transform: uppercase; text-align: center; }
+#code::placeholder { color: #B5AE9E; letter-spacing: .12em; }
+
+.error { font-size: 14px; color: var(--error); font-weight: 500; }
+
+.demo-note {
+  margin-top: 24px; padding: 14px 16px; border: 1px dashed var(--field); border-radius: 6px;
+  font-size: 14px; color: var(--navy-soft); display: flex; flex-direction: column; gap: 8px;
+}
+.demo-codes { display: flex; flex-wrap: wrap; gap: 6px; }
+.demo-codes button {
+  min-height: 36px; padding: 0 12px; border: 1px solid var(--field); border-radius: 18px;
+  background: #fff; color: var(--navy); font-size: 13px; letter-spacing: .06em; cursor: pointer;
+}
+
+/* trappola per i bot: fuori dallo schermo */
+.hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+
+/* ---------- RSVP: modulo personalizzato ---------- */
+.hello { text-align: center; margin-bottom: 32px; }
+.hello h2 { font-style: italic; font-size: 44px; line-height: 1.15; }
+.hello h2:focus { outline: none; }
+.hello p { margin: 6px 0 0; }
+.note {
+  background: var(--lemon-soft); border-radius: 6px; padding: 10px 14px; font-size: 15px;
+}
+.link-btn {
+  margin-top: 8px; min-height: 44px; padding: 0 8px; border: 0; background: none;
+  color: var(--navy-soft); text-decoration: underline; cursor: pointer; font-size: 14px;
+}
+
+.part { display: flex; flex-direction: column; gap: 24px; }
+.event {
+  display: grid; grid-template-columns: 140px minmax(0, 1fr); gap: 20px; align-items: start;
+  padding-bottom: 24px; border-bottom: 1px solid var(--line);
+}
+.event img { width: 140px; aspect-ratio: 1; object-fit: cover; border-radius: 4px; }
+.event h3 { font-style: italic; font-size: 30px; line-height: 1.15; margin-bottom: 4px; }
+.event .facts { font-size: 15px; }
+.part-label { font-size: 13px; letter-spacing: .16em; text-transform: uppercase; font-weight: 500; color: var(--navy-soft); }
+
+fieldset { margin: 0; padding: 0; border: 0; min-width: 0; }
+legend { padding: 0; margin-bottom: 14px; font-family: var(--serif); font-size: 24px; line-height: 1.3; font-weight: 500; }
+
+.people { display: flex; flex-direction: column; gap: 10px; }
+.person {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 16px;
+  padding: 10px 14px; background: #fff; border: 1px solid var(--line); border-radius: 6px;
+}
+.person-name { font-weight: 500; font-size: 18px; }
+.choice { display: flex; flex-wrap: wrap; gap: 8px; }
+.choice label { position: relative; cursor: pointer; }
+.choice input { position: absolute; inset: 0; opacity: 0; margin: 0; cursor: pointer; }
+.choice span {
+  display: inline-flex; align-items: center; min-height: 44px; padding: 0 18px;
+  border: 1px solid var(--field); border-radius: 22px; background: var(--cream); font-size: 15px;
+}
+.choice input:checked + span { background: var(--navy); border-color: var(--navy); color: var(--cream); }
+.choice input[value="no"]:checked + span { background: var(--navy-soft); border-color: var(--navy-soft); }
+.choice input:focus-visible + span { outline: 2px solid var(--navy); outline-offset: 2px; }
+
+.sad {
+  display: grid; grid-template-columns: 112px minmax(0, 1fr); gap: 16px; align-items: start;
+  padding: 16px; background: var(--lemon-soft); border-radius: 6px;
+}
+.sad img { width: 112px; border-radius: 4px; }
+.sad p { margin: 0 0 6px; font-weight: 500; }
+.sad .field label { font-weight: 400; font-size: 14px; }
+
+.mood {
+  margin: 0; padding: 14px 16px; background: var(--lemon-soft); border-radius: 6px;
+  font-family: var(--serif); font-size: 22px; font-style: italic; line-height: 1.35; text-align: center;
+}
+
+.actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 12px; }
+.actions .btn-wide { min-width: 180px; }
+#send-error { margin-top: 16px; text-align: center; }
+
+/* ---------- RSVP: grazie ---------- */
+.thanks { text-align: center; display: flex; flex-direction: column; align-items: center; gap: 16px; }
+.thanks h2 { font-style: italic; font-size: 42px; line-height: 1.15; }
+.thanks h2:focus { outline: none; }
+.thanks p { margin: 0; max-width: 480px; }
+.thanks figure { margin: 8px 0 0; max-width: 420px; }
+.thanks figure img { border-radius: 6px; }
+.thanks figcaption { margin-top: 8px; font-size: 14px; font-style: italic; color: var(--navy-soft); }
+
+.symbols { display: flex; justify-content: center; align-items: flex-end; gap: 10px; color: var(--navy); }
+.symbols svg { width: 52px; height: 52px; }
+.symbols svg.big { width: 68px; height: 68px; }
+@media (prefers-reduced-motion: no-preference) {
+  .symbols svg { animation: rise .7s cubic-bezier(.2, .7, .3, 1) both; }
+  .symbols svg:nth-child(2) { animation-delay: .08s; }
+  .symbols svg:nth-child(3) { animation-delay: .16s; }
+  .symbols svg:nth-child(4) { animation-delay: .24s; }
+  .symbols svg:nth-child(5) { animation-delay: .32s; }
+}
+@keyframes rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+
+/* ---------- Footer ---------- */
+footer { padding: 48px 24px; text-align: center; font-family: var(--serif); font-style: italic; font-size: 24px; }
+
+/* ---------- Telefono ---------- */
+@media (max-width: 560px) {
+  h2 { font-size: 42px; }
+  nav { gap: 16px; }
+  .rsvp { padding: 56px 12px; }
+  .panel-inner { padding: 28px 18px 36px; }
+  .hello h2, .thanks h2 { font-size: 36px; }
+  .event { grid-template-columns: 88px minmax(0, 1fr); gap: 14px; }
+  .event img { width: 88px; }
+  .event h3 { font-size: 24px; }
+  .sad { grid-template-columns: 1fr; }
+  .sad img { width: 96px; }
+  .actions { justify-content: stretch; }
+  .actions .btn { flex: 1 1 auto; }
+  .symbols { gap: 4px; }
+  .symbols svg { width: 44px; height: 44px; }
+  .symbols svg.big { width: 56px; height: 56px; }
+}

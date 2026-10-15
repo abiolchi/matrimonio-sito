@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Max &amp; Alice · 19.09.2027 · Lerici</title>
+  <meta name="description" content="Max & Alice · 19 settembre 2027 · Lerici">
+  <meta name="theme-color" content="#FBF7EE">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Jost:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="wrap top">
+  <a class="mono" href="#top" aria-label="Max &amp; Alice">M &amp; A</a>
+  <nav aria-label="Menu">
+    <a href="#day" data-i18n="navDay">Programma</a>
+    <a href="#travel" data-i18n="navTravel">Viaggio e alloggio</a>
+    <a href="#rsvp" data-i18n="navRsvp">RSVP</a>
+    <div class="langs" role="group" aria-label="Lingua / Langue / Language">
+      <button type="button" data-lang="it" aria-pressed="true">IT</button>
+      <button type="button" data-lang="fr" aria-pressed="false">FR</button>
+      <button type="button" data-lang="en" aria-pressed="false">EN</button>
+    </div>
+  </nav>
+</header>
+
+<main id="top">
+
+  <!-- ======================= HERO (acquerello: css/style.css, sezione Hero) ======================= -->
+  <section class="hero">
+    <div class="wrap hero-inner">
+      <svg width="220" height="120" viewBox="0 0 220 120" aria-hidden="true">
+        <path d="M50 80 A60 60 0 0 1 170 80" fill="#E8B931"/>
+        <path d="M20 88 Q47 78 74 88 T128 88 T182 88 T236 88" fill="none" stroke="#1F3A5F" stroke-width="2"/>
+        <path d="M0 100 Q27 90 54 100 T108 100 T162 100 T216 100" fill="none" stroke="#1F3A5F" stroke-width="2"/>
+        <path d="M20 112 Q47 102 74 112 T128 112 T182 112 T236 112" fill="none" stroke="#1F3A5F" stroke-width="2" opacity="0.5"/>
+      </svg>
+      <div class="kicker" data-i18n="kicker">Ci sposiamo</div>
+      <h1 class="names">Max &amp; Alice</h1>
+      <div class="date" data-i18n="date">Domenica 19 settembre 2027</div>
+      <div class="place" data-i18n="place">Lerici · Golfo dei Poeti</div>
+      <p class="intro" data-i18n="intro">Saremmo felici di festeggiare con voi in riva al mare, in Liguria. Qui troverete tutte le informazioni, che aggiorneremo man mano.</p>
+      <a class="btn" href="#rsvp" data-i18n="cta">Conferma la presenza</a>
+    </div>
+  </section>
+
+  <!-- ======================= PROGRAMMA ======================= -->
+  <section id="day" class="day">
+    <div class="wrap">
+      <h2 data-i18n="dayTitle">Programma</h2>
+      <div class="cards">
+        <article class="card">
+          <img src="assets/img/villa-marigola.jpg" width="800" height="793" loading="lazy" alt="" data-i18n-alt="altVilla">
+          <div class="card-body">
+            <div class="card-day" data-i18n="ev1Day">Domenica 19 settembre 2027</div>
+            <h3 class="title" data-i18n="ev1Title">Cerimonia simbolica e ricevimento</h3>
+            <dl class="facts">
+              <div><dt data-i18n="labelTime">Orario</dt><dd>16:00 – 02:00</dd></div>
+              <div><dt data-i18n="labelPlace">Luogo</dt><dd>Villa Marigola, Lerici</dd></div>
+            </dl>
+            <a class="map-link" href="https://maps.app.goo.gl/RPm8QRS6ktQr2fqP8" target="_blank" rel="noopener" data-i18n="mapLink">Apri su Google Maps</a>
+          </div>
+        </article>
+        <article class="card">
+          <img src="assets/img/castello-lerici.jpg" width="800" height="796" loading="lazy" alt="" data-i18n-alt="altCastle">
+          <div class="card-body">
+            <div class="card-day" data-i18n="ev2Day">Lunedì 20 settembre 2027</div>
+            <h3 class="title" data-i18n="ev2Title">Matrimonio civile</h3>
+            <dl class="facts">
+              <div><dt data-i18n="labelTime">Orario</dt><dd>12:30</dd></div>
+              <div><dt data-i18n="labelPlace">Luogo</dt><dd>Castello di Lerici / Municipio di Lerici</dd></div>
+            </dl>
+            <a class="map-link" href="https://www.google.com/maps/search/?api=1&amp;query=Castello+di+Lerici" target="_blank" rel="noopener" data-i18n="mapLink">Apri su Google Maps</a>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================= VIAGGIO ======================= -->
+  <section id="travel" class="wrap travel">
+    <h2 data-i18n="travelTitle">Viaggio e alloggio</h2>
+    <p data-i18n="travelBody">Stiamo preparando consigli su come arrivare a Lerici e dove dormire. Torna presto a trovarci.</p>
+    <div class="rule" aria-hidden="true"></div>
+  </section>
+
+  <!-- ======================= RSVP ======================= -->
+  <section id="rsvp" class="rsvp">
+    <div class="panel" id="rsvp-panel">
+
+      <!-- Passo 1: codice dell'invito -->
+      <div id="step-code">
+        <img class="panel-cover" src="assets/img/lerici-porto.jpg" width="1200" height="670" loading="lazy" alt="" data-i18n-alt="altPort">
+        <div class="panel-inner">
+          <div class="panel-head">
+            <h2>RSVP</h2>
+            <p data-i18n="rsvpSub">Ti chiediamo di rispondere entro il [DATA].</p>
+          </div>
+          <form id="code-form" class="stack" novalidate>
+            <div class="field">
+              <label for="code" data-i18n="codeIntro">Inserisci il codice che trovi sul tuo invito.</label>
+              <input id="code" name="code" type="text" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="LIMONE-4K7" aria-describedby="code-error">
+              <div id="code-error" class="error" role="alert" hidden></div>
+            </div>
+            <button class="btn btn-wide" type="submit" id="code-btn" data-i18n="codeBtn">Continua</button>
+          </form>
+          <div id="demo-note" class="demo-note" hidden>
+            <span data-i18n="demoNote">Modalità di prova</span>
+            <span id="demo-codes" class="demo-codes"></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Passo 2: modulo personalizzato -->
+      <form id="rsvp-form" class="panel-inner" novalidate hidden>
+        <div class="hello">
+          <h2 id="hello" tabindex="-1"></h2>
+          <p id="hello-sub"></p>
+          <p id="already" class="note" hidden></p>
+          <button type="button" id="not-me" class="link-btn" data-i18n="notMe">Non sei tu? Inserisci un altro codice</button>
+        </div>
+
+        <!-- trappola per i bot: invisibile alle persone -->
+        <div class="hp" aria-hidden="true">
+          <label for="website">Website</label>
+          <input id="website" name="website" type="text" tabindex="-1" autocomplete="off">
+        </div>
+
+        <!-- Parte 1: domenica -->
+        <section id="part1" class="part" aria-labelledby="q1">
+          <div class="event">
+            <img src="assets/img/villa-marigola.jpg" width="800" height="793" alt="" data-i18n-alt="altVilla">
+            <div>
+              <div class="part-label" data-i18n="part1">Parte 1</div>
+              <h3 data-i18n="ev1Title">Cerimonia simbolica e ricevimento</h3>
+              <dl class="facts">
+                <div><dt data-i18n="labelDate">Data</dt><dd data-i18n="ev1Day">Domenica 19 settembre 2027</dd></div>
+                <div><dt data-i18n="labelTime">Orario</dt><dd>16:00 – 02:00</dd></div>
+                <div><dt data-i18n="labelPlace">Luogo</dt><dd>Villa Marigola, Lerici</dd></div>
+              </dl>
+              <a class="map-link" href="https://maps.app.goo.gl/RPm8QRS6ktQr2fqP8" target="_blank" rel="noopener" data-i18n="mapLink">Apri su Google Maps</a>
+            </div>
+          </div>
+          <fieldset>
+            <legend id="q1"></legend>
+            <div id="rows-sun" class="people"></div>
+          </fieldset>
+          <div id="sad" class="sad" hidden>
+            <img src="assets/img/mano-italiana.jpg" width="223" height="148" alt="" data-i18n-alt="altHand">
+            <div class="field">
+              <p id="sad-text"></p>
+              <label for="why" data-i18n="whyLabel">Raccontaci (facoltativo)</label>
+              <textarea id="why" name="message" rows="3" maxlength="1000"></textarea>
+            </div>
+          </div>
+          <div id="err-sun" class="error" role="alert" data-i18n="errAnswerAll" hidden>Rispondi per ogni persona.</div>
+          <div class="actions">
+            <button type="button" id="next-btn" class="btn btn-wide" data-i18n="next">Avanti</button>
+            <button type="submit" id="send-btn-1" class="btn btn-wide" data-i18n="send" hidden>Invia</button>
+          </div>
+        </section>
+
+        <!-- Parte 2: lunedì (solo per chi è invitato al civile) -->
+        <section id="part2" class="part" aria-labelledby="q2" hidden>
+          <div class="event">
+            <img src="assets/img/castello-lerici.jpg" width="800" height="796" alt="" data-i18n-alt="altCastle">
+            <div>
+              <div class="part-label" data-i18n="part2">Parte 2</div>
+              <h3 data-i18n="ev2Title">Matrimonio civile</h3>
+              <dl class="facts">
+                <div><dt data-i18n="labelDate">Data</dt><dd data-i18n="ev2Day">Lunedì 20 settembre 2027</dd></div>
+                <div><dt data-i18n="labelTime">Orario</dt><dd>12:30</dd></div>
+                <div><dt data-i18n="labelPlace">Luogo</dt><dd>Castello di Lerici / Municipio di Lerici</dd></div>
+              </dl>
+              <a class="map-link" href="https://www.google.com/maps/search/?api=1&amp;query=Castello+di+Lerici" target="_blank" rel="noopener" data-i18n="mapLink">Apri su Google Maps</a>
+            </div>
+          </div>
+          <fieldset>
+            <legend id="q2"></legend>
+            <div id="rows-mon" class="people"></div>
+          </fieldset>
+          <p id="mood" class="mood" role="status" hidden></p>
+          <div id="err-mon" class="error" role="alert" data-i18n="errAnswerAll" hidden>Rispondi per ogni persona.</div>
+          <div class="actions">
+            <button type="button" id="back-btn" class="btn btn-ghost" data-i18n="back">Indietro</button>
+            <button type="submit" id="send-btn-2" class="btn btn-wide" data-i18n="send">Invia</button>
+          </div>
+        </section>
+
+        <div id="send-error" class="error" role="alert" hidden></div>
+      </form>
+
+      <!-- Passo 3: grazie -->
+      <div id="thanks" class="panel-inner thanks" hidden>
+        <div class="symbols" aria-hidden="true">
+          <!-- case colorate -->
+          <svg viewBox="0 0 64 64"><g stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M8 56V30l8-6 8 6v26z" fill="#F2C9A0"/><path d="M24 56V22l9-7 9 7v34z" fill="#E8B931"/><path d="M42 56V32l7-5 7 5v24z" fill="#E59A7E"/><path d="M4 56h56" fill="none"/></g><g fill="currentColor"><rect x="14" y="36" width="4" height="6"/><rect x="31" y="27" width="4" height="6"/><rect x="31" y="40" width="4" height="6"/><rect x="47" y="38" width="4" height="6"/></g></svg>
+          <!-- barca a vela -->
+          <svg viewBox="0 0 64 64"><g stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M33 8v36" fill="none"/><path d="M33 10l15 30H33z" fill="#FBF7EE"/><path d="M31 15L19 40h12z" fill="#E8B931"/><path d="M12 45h40l-6 7H18z" fill="currentColor"/><path d="M4 59c5-3 9-3 14 0s9 3 14 0 9-3 14 0 9 3 14 0" fill="none"/></g></svg>
+          <!-- castello di San Giorgio -->
+          <svg viewBox="0 0 64 64" class="big"><g stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M5 57c4-6 10-9 16-8 4-5 14-6 20-2 6-2 14 2 18 10z" fill="#D9CBA6"/><path d="M20 49V24h24v25" fill="#F3EBD7"/><path d="M18 24V18h4v3h4v-3h4v3h4v-3h4v3h4v-3h4v6z" fill="#F3EBD7"/><path d="M29 49v-7a3 3 0 0 1 6 0v7z" fill="currentColor"/><path d="M32 18V7" fill="none"/><path d="M32 7l8 2.5-8 2.5z" fill="#E8B931"/></g><g fill="currentColor"><rect x="24.5" y="29" width="3" height="5"/><rect x="36.5" y="29" width="3" height="5"/></g></svg>
+          <!-- limone -->
+          <svg viewBox="0 0 64 64"><g stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><ellipse cx="30" cy="38" rx="19" ry="13.5" transform="rotate(-30 30 38)" fill="#E8B931"/><path d="M46.5 28.5l3-3M13.5 47.5l-3 3" fill="none"/><path d="M49.5 25.5c1-8 7-12 12-12 0 7-5 12-12 12z" fill="#8FA876"/><path d="M49.5 25.5l7-7" fill="none"/></g></svg>
+          <!-- sole sul mare -->
+          <svg viewBox="0 0 64 64"><g stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"><path d="M18 40a14 14 0 0 1 28 0z" fill="#E8B931"/><path d="M32 20v-7M20 27l-5-5M44 27l5-5M13 38H6M51 38h7" fill="none"/><path d="M4 47c5-3 9-3 14 0s9 3 14 0 9-3 14 0 9 3 14 0" fill="none"/><path d="M4 55c5-3 9-3 14 0s9 3 14 0 9-3 14 0 9 3 14 0" fill="none" opacity=".55"/></g></svg>
+        </div>
+        <h2 id="thanks-title" tabindex="-1"></h2>
+        <p id="thanks-body"></p>
+        <figure>
+          <img src="assets/img/matrimonio-villa.jpg" width="900" height="900" loading="lazy" alt="" data-i18n-alt="altWedding">
+          <figcaption data-i18n="imgCaption">Questa immagine non rispecchia affatto la realtà</figcaption>
+        </figure>
+        <button type="button" id="edit-btn" class="btn btn-ghost" data-i18n="editAnswers">Modifica le risposte</button>
+      </div>
+
+    </div>
+  </section>
+
+</main>
+
+<footer data-i18n="footer">Con amore, Max &amp; Alice</footer>
+
+<script src="js/config.js"></script>
+<script src="js/i18n.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>
