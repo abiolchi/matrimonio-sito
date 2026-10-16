@@ -96,7 +96,9 @@ window.TRANSLATIONS = {
     imgCaption: "Questa immagine non rispecchia affatto la realtà",
     editAnswers: "Modifica le risposte",
 
-    footer: "Con amore, Alice & Max"
+    footer: "Con amore, Alice & Max",
+    credits: "Realizzato da Alice, Max con l'aiuto di Claude",
+    sourceLink: "Il codice su GitHub"
   },
 
   fr: {
@@ -174,7 +176,9 @@ window.TRANSLATIONS = {
     imgCaption: "Cette image ne reflète pas du tout la réalité",
     editAnswers: "Modifier les réponses",
 
-    footer: "Avec amour, Alice & Max"
+    footer: "Avec amour, Alice & Max",
+    credits: "Réalisé par Alice et Max avec l'aide de Claude",
+    sourceLink: "Le code sur GitHub"
   },
 
   en: {
@@ -251,6 +255,8 @@ window.TRANSLATIONS = {
     imgCaption: "This image does not reflect reality at all",
     editAnswers: "Change my answers",
 
-    footer: "With love, Alice & Max"
+    footer: "With love, Alice & Max",
+    credits: "Made by Alice and Max with help from Claude",
+    sourceLink: "The code on GitHub"
   }
 };
