@@ -52,9 +52,12 @@
     render();
   }
 
+  // La scelta manuale vale solo per questa visita: alla visita successiva
+  // il codice dell'invito torna a decidere la lingua.
+  var langClicked = false;
+
   function langChosenByUser() {
-    if (new URLSearchParams(location.search).get("lang")) return true;
-    try { return localStorage.getItem("langChosen") === "1"; } catch (e) { return false; }
+    return langClicked || !!new URLSearchParams(location.search).get("lang");
   }
 
   function initialLang() {
@@ -69,9 +72,11 @@
     return LANGS.indexOf(browser) !== -1 ? browser : DEFAULT_LANG;
   }
 
+  try { localStorage.removeItem("langChosen"); } catch (e) {} // residuo delle versioni precedenti
+
   document.querySelectorAll(".langs button").forEach(function (b) {
     b.addEventListener("click", function () {
-      try { localStorage.setItem("langChosen", "1"); } catch (e) {}
+      langClicked = true;
       setLang(b.dataset.lang);
     });
   });

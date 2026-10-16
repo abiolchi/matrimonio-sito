@@ -54,9 +54,9 @@ I testi stanno in `js/i18n.js`. Ogni elemento in `index.html` con `data-i18n="ch
 La lingua iniziale viene scelta in quest'ordine:
 
 1. `?lang=fr` nell'indirizzo;
-2. la scelta fatta dall'ospite;
-3. la lingua dell'invito, dopo aver inserito il codice;
-4. la lingua del browser;
+2. la scelta fatta dall'ospite con i pulsanti, durante la stessa visita;
+3. la lingua dell'invito, dopo aver inserito il codice (anche se in una visita precedente aveva scelto un'altra lingua);
+4. l'ultima lingua usata su quel browser, poi la lingua del browser;
 5. l'italiano.
 
 **Link personale da mandare agli ospiti:** `https://vostro-dominio/?code=LIMONE-4K7#rsvp`
