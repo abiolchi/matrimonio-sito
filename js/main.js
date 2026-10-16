@@ -4,9 +4,9 @@
    Flusso RSVP (ricalca il modulo Tally originale):
    1. l'ospite inserisce il codice dell'invito (o arriva con ?code=…)
    2. Parte 1 – domenica (cerimonia simbolica + ricevimento): una risposta per persona;
-      se qualcuno non viene → mano italiana + "Perché??" + messaggio facoltativo
+      sotto chi non viene → mano italiana + "Perché??"
    3. Parte 2 – lunedì (matrimonio civile), solo se l'invito lo prevede;
-      messaggio diverso secondo la combinazione di risposte
+      sotto ogni persona un messaggio diverso secondo la combinazione di risposte
    4. pagina di ringraziamento con i simboli di Lerici
    ========================================================= */
 
@@ -228,7 +228,6 @@
         if (i > -1) state.ans[i] = { sun: p.sunday, mon: p.monday };
       });
     }
-    $("why").value = (state.previous && state.previous.message) || "";
     $("website").value = "";
 
     buildRows("rows-sun", "sun");
@@ -280,8 +279,25 @@
         group.appendChild(opt);
       });
 
+      // messaggio sotto la persona (vedi render)
+      var msg = document.createElement("div");
+      msg.className = "person-msg";
+      msg.id = part + "-msg-" + i;
+      msg.setAttribute("role", "status");
+      msg.hidden = true;
+      if (part === "sun") {
+        var hand = document.createElement("img");
+        hand.src = "assets/img/mano-italiana.jpg";
+        hand.width = 223;
+        hand.height = 148;
+        hand.alt = "";
+        msg.appendChild(hand);
+      }
+      msg.appendChild(document.createElement("p"));
+
       row.appendChild(label);
       row.appendChild(group);
+      row.appendChild(msg);
       box.appendChild(row);
     });
   }
@@ -341,7 +357,7 @@
       code: state.guest.code,
       lang: current,
       website: $("website").value,
-      message: any("sun", false) ? $("why").value.trim() : "",
+      message: "",
       people: state.guest.names.map(function (name, i) {
         return { name: name, sunday: state.ans[i].sun, monday: civil ? state.ans[i].mon : null };
       })
@@ -380,24 +396,26 @@
     $("q1").textContent = t("q1", n);
     $("q2").textContent = t("q2", n);
 
-    // Parte 1: qualcuno non viene → mano italiana + "Perché??"
-    var someoneMissing = any("sun", false);
-    $("sad").hidden = !someoneMissing;
-    $("sad-text").textContent = t("sad", n);
+    // Parte 1: sotto chi non viene → mano italiana + "Perché??"
+    state.ans.forEach(function (a, i) {
+      var msg = $("sun-msg-" + i);
+      if (!msg) return;
+      msg.hidden = a.sun !== false;
+      msg.querySelector("p").textContent = t("sad", 1);
+    });
 
     // Parte 1: "Avanti" se c'è la Parte 2, altrimenti "Invia"
     $("next-btn").hidden = !civil;
     $("send-btn-1").hidden = civil;
 
-    // Parte 2: messaggio secondo la combinazione di risposte (come nel modulo Tally)
-    var mood = $("mood");
-    if (civil && allAnswered("sun") && allAnswered("mon")) {
-      var sun = any("sun", true), mon = any("mon", true);
-      mood.textContent = t(sun && mon ? "msgBoth" : sun ? "msgSundayOnly" : mon ? "msgMondayOnly" : "msgNone", n);
-      mood.hidden = false;
-    } else {
-      mood.hidden = true;
-    }
+    // Parte 2: sotto ogni persona un messaggio secondo la combinazione di risposte (come nel modulo Tally)
+    state.ans.forEach(function (a, i) {
+      var msg = $("mon-msg-" + i);
+      if (!msg) return;
+      var ready = civil && a.sun !== null && a.mon !== null;
+      msg.hidden = !ready;
+      if (ready) msg.querySelector("p").textContent = t(a.sun && a.mon ? "msgBoth" : a.sun ? "msgSundayOnly" : a.mon ? "msgMondayOnly" : "msgNone", 1);
+    });
 
     // Grazie
     var anyoneComing = any("sun", true) || any("mon", true);
