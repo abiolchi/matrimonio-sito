@@ -212,17 +212,10 @@ legend { padding: 0; margin-bottom: 14px; font-family: var(--serif); font-size: 
 .choice input[value="no"]:checked + span { background: var(--navy-soft); border-color: var(--navy-soft); }
 .choice input:focus-visible + span { outline: 2px solid var(--navy); outline-offset: 2px; }
 
-.sad {
-  display: grid; grid-template-columns: 112px minmax(0, 1fr); gap: 16px; align-items: start;
-  padding: 16px; background: var(--lemon-soft); border-radius: 6px;
-}
-.sad img { width: 112px; border-radius: 4px; }
-.sad p { margin: 0 0 6px; font-weight: 500; }
-.sad .field label { font-weight: 400; font-size: 14px; }
-
-.mood {
-  margin: 0; padding: 14px 16px; background: var(--lemon-soft); border-radius: 6px;
-  font-family: var(--serif); font-size: 22px; font-style: italic; line-height: 1.35; text-align: center;
+/* messaggio sotto ogni persona, secondo la sua risposta */
+.feedback {
+  flex: 1 1 100%; margin: 2px 0 0; padding: 12px 14px; background: var(--lemon-soft); border-radius: 6px;
+  font-weight: 500; line-height: 1.4;
 }
 
 .actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 12px; }
@@ -263,8 +256,6 @@ footer { padding: 48px 24px; text-align: center; font-family: var(--serif); font
   .event { grid-template-columns: 88px minmax(0, 1fr); gap: 14px; }
   .event img { width: 88px; }
   .event h3 { font-size: 24px; }
-  .sad { grid-template-columns: 1fr; }
-  .sad img { width: 96px; }
   .actions { justify-content: stretch; }
   .actions .btn { flex: 1 1 auto; }
   .symbols { gap: 4px; }

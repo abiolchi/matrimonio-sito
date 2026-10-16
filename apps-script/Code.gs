@@ -21,7 +21,7 @@ var SHEET_LOG = 'Storico';
 var SHEET_SUMMARY = 'Riepilogo';
 
 var GUEST_HEADERS = ['Codice', 'Nomi (separati da ;)', 'Lingua (it / fr / en)', 'Invitati al civile (sì / no)', 'Note (private)'];
-var ANSWER_HEADERS = ['Data risposta', 'Codice', 'Nome', 'Domenica 19/9 – cerimonia e ricevimento', 'Lunedì 20/9 – matrimonio civile', 'Messaggio', 'Lingua'];
+var ANSWER_HEADERS = ['Data risposta', 'Codice', 'Nome', 'Domenica 19/9 – cerimonia e ricevimento', 'Lunedì 20/9 – matrimonio civile', 'Lingua'];
 var LOG_HEADERS = ['Data', 'Codice', 'Azione', 'Dettaglio (JSON)'];
 
 // Invitati di prova: gli stessi della modalità di prova del sito.
@@ -60,7 +60,7 @@ function setupSheets() {
   guests.setColumnWidth(1, 130).setColumnWidth(2, 260).setColumnWidth(3, 140).setColumnWidth(4, 200).setColumnWidth(5, 240);
 
   var answers = getOrCreateSheet_(ss, SHEET_ANSWERS, ANSWER_HEADERS);
-  answers.setColumnWidth(1, 150).setColumnWidth(3, 160).setColumnWidth(4, 260).setColumnWidth(5, 240).setColumnWidth(6, 320);
+  answers.setColumnWidth(1, 150).setColumnWidth(3, 160).setColumnWidth(4, 260).setColumnWidth(5, 240);
 
   getOrCreateSheet_(ss, SHEET_LOG, LOG_HEADERS).setColumnWidth(4, 500);
 
@@ -169,7 +169,6 @@ function save_(data) {
     byName[person.name] = person;
   }
 
-  var message = String(data.message || '').slice(0, 1000);
   var lang = LANGS.indexOf(data.lang) > -1 ? data.lang : guest.lang;
   var now = new Date();
 
@@ -180,7 +179,7 @@ function save_(data) {
     var sheet = ss.getSheetByName(SHEET_ANSWERS);
     var hadAnswers = deleteAnswerRows_(sheet, guest.code);
 
-    var rows = guest.names.map(function (name, idx) {
+    var rows = guest.names.map(function (name) {
       var p = byName[name];
       return [
         now,
@@ -188,7 +187,6 @@ function save_(data) {
         name,
         p.sunday ? 'Sì' : 'No',
         guest.civil ? (p.monday ? 'Sì' : 'No') : '—',
-        idx === 0 ? safeText_(message) : '',
         lang
       ];
     });
@@ -196,7 +194,7 @@ function save_(data) {
 
     ss.getSheetByName(SHEET_LOG).appendRow([
       now, guest.code, hadAnswers ? 'Modifica' : 'Nuova risposta',
-      safeText_(JSON.stringify({ people: people, message: message, lang: lang }))
+      safeText_(JSON.stringify({ people: people, lang: lang }))
     ]);
   } finally {
     lock.releaseLock();
@@ -234,7 +232,7 @@ function readAnswers_(code) {
   var sheet = SpreadsheetApp.getActive().getSheetByName(SHEET_ANSWERS);
   if (!sheet || sheet.getLastRow() < 2) return null;
   var values = sheet.getRange(2, 1, sheet.getLastRow() - 1, ANSWER_HEADERS.length).getValues();
-  var people = [], message = '', updatedAt = null;
+  var people = [], updatedAt = null;
   values.forEach(function (r) {
     if (String(r[1]) !== code) return;
     people.push({
@@ -242,10 +240,9 @@ function readAnswers_(code) {
       sunday: r[3] === 'Sì' ? true : r[3] === 'No' ? false : null,
       monday: r[4] === 'Sì' ? true : r[4] === 'No' ? false : null
     });
-    if (r[5]) message = String(r[5]).replace(/^'/, '');
     if (r[0] instanceof Date) updatedAt = r[0].toISOString();
   });
-  return people.length ? { updatedAt: updatedAt, message: message, people: people } : null;
+  return people.length ? { updatedAt: updatedAt, people: people } : null;
 }
 
 function deleteAnswerRows_(sheet, code) {

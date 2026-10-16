@@ -18,8 +18,8 @@ Leggi anche README.md e apps-script/GUIDA.md.
   - dati in Google Sheet + Apps Script (`apps-script/Code.gs`), con le schede Invitati, Risposte (una riga per persona, sostituite a ogni modifica), Storico e Riepilogo;
   - `js/config.js` → `endpoint` vuoto = modalità di prova con 4 invitati finti (gli stessi di TEST_GUESTS in Code.gs).
   - Il flusso ricalca il vecchio modulo Tally "RSVP - Wedding of Alice & Max" (id eq1dQ0):
-    1. Parte 1 (domenica): sì/no per persona; se qualcuno dice no compaiono la mano italiana, "Perché?? 🤌🏼" e un messaggio facoltativo.
-    2. Parte 2 (civile): solo se l'invito ha "Invitati al civile = sì"; un messaggio diverso per ciascuna combinazione (msgBoth / msgSundayOnly / msgMondayOnly / msgNone).
+    1. Parte 1 (domenica): sì/no per persona; sotto ogni persona compare un riquadro giallo (sunYes / sunNo "Perché?? 🤌🏼"). Niente messaggio libero.
+    2. Parte 2 (civile): solo se l'invito ha "Invitati al civile = sì"; sotto ogni persona un messaggio secondo la sua combinazione domenica+lunedì (msgBoth / msgSundayOnly / msgMondayOnly / msgNone).
     3. Grazie: simboli di Lerici in SVG e l'acquerello con la didascalia "non rispecchia la realtà".
 - Sicurezza: la lista non sta mai nel codice del sito; i codici sono casuali; blocco dopo 50 codici sbagliati in 10 minuti; campo trappola per i bot; testi protetti dall'interpretazione come formule.
 

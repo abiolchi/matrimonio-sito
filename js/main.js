@@ -4,9 +4,9 @@
    Flusso RSVP (ricalca il modulo Tally originale):
    1. l'ospite inserisce il codice dell'invito (o arriva con ?code=…)
    2. Parte 1 – domenica (cerimonia simbolica + ricevimento): una risposta per persona;
-      se qualcuno non viene → mano italiana + "Perché??" + messaggio facoltativo
+      sotto ogni persona compare un messaggio ("Evviva!" oppure "Perché?? 🤌🏼")
    3. Parte 2 – lunedì (matrimonio civile), solo se l'invito lo prevede;
-      messaggio diverso secondo la combinazione di risposte
+      sotto ogni persona, un messaggio secondo la combinazione delle sue risposte
    4. pagina di ringraziamento con i simboli di Lerici
    ========================================================= */
 
@@ -133,7 +133,7 @@
         if (!g) return later({ ok: false, error: "not_found" });
         var all = load();
         var now = new Date().toISOString();
-        all[g.code] = { updatedAt: now, message: payload.message, people: payload.people };
+        all[g.code] = { updatedAt: now, people: payload.people };
         store(all);
         return later({ ok: true, updatedAt: now });
       }
@@ -228,7 +228,6 @@
         if (i > -1) state.ans[i] = { sun: p.sunday, mon: p.monday };
       });
     }
-    $("why").value = (state.previous && state.previous.message) || "";
     $("website").value = "";
 
     buildRows("rows-sun", "sun");
@@ -280,8 +279,16 @@
         group.appendChild(opt);
       });
 
+      // messaggio per questa persona, riempito da render()
+      var feedback = document.createElement("p");
+      feedback.className = "feedback";
+      feedback.id = part + "-fb-" + i;
+      feedback.setAttribute("role", "status");
+      feedback.hidden = true;
+
       row.appendChild(label);
       row.appendChild(group);
+      row.appendChild(feedback);
       box.appendChild(row);
     });
   }
@@ -341,7 +348,6 @@
       code: state.guest.code,
       lang: current,
       website: $("website").value,
-      message: any("sun", false) ? $("why").value.trim() : "",
       people: state.guest.names.map(function (name, i) {
         return { name: name, sunday: state.ans[i].sun, monday: civil ? state.ans[i].mon : null };
       })
@@ -353,7 +359,7 @@
     api.save(payload)
       .then(function (res) {
         if (res && res.ok) {
-          state.previous = { updatedAt: res.updatedAt, message: payload.message, people: payload.people };
+          state.previous = { updatedAt: res.updatedAt, people: payload.people };
           go("thanks", $("thanks-title"));
           return;
         }
@@ -364,6 +370,12 @@
   });
 
   /* ---------- Testi che dipendono dall'invito e dalle risposte ---------- */
+
+  function showFeedback(el, key) {
+    if (!el) return;
+    el.hidden = !key;
+    el.textContent = key ? t(key) : "";
+  }
 
   function render() {
     if (!state.guest) return;
@@ -380,24 +392,21 @@
     $("q1").textContent = t("q1", n);
     $("q2").textContent = t("q2", n);
 
-    // Parte 1: qualcuno non viene → mano italiana + "Perché??"
-    var someoneMissing = any("sun", false);
-    $("sad").hidden = !someoneMissing;
-    $("sad-text").textContent = t("sad", n);
+    // Messaggio sotto ogni persona, secondo la sua risposta
+    state.ans.forEach(function (a, i) {
+      // Parte 1: sì → "Evviva!", no → "Perché?? 🤌🏼"
+      showFeedback($("sun-fb-" + i), a.sun === null ? null : a.sun ? "sunYes" : "sunNo");
+      // Parte 2: combinazione di domenica e lunedì (come nel modulo Tally)
+      var monKey = null;
+      if (civil && a.mon !== null && a.sun !== null) {
+        monKey = a.sun && a.mon ? "msgBoth" : a.sun ? "msgSundayOnly" : a.mon ? "msgMondayOnly" : "msgNone";
+      }
+      showFeedback($("mon-fb-" + i), monKey);
+    });
 
     // Parte 1: "Avanti" se c'è la Parte 2, altrimenti "Invia"
     $("next-btn").hidden = !civil;
     $("send-btn-1").hidden = civil;
-
-    // Parte 2: messaggio secondo la combinazione di risposte (come nel modulo Tally)
-    var mood = $("mood");
-    if (civil && allAnswered("sun") && allAnswered("mon")) {
-      var sun = any("sun", true), mon = any("mon", true);
-      mood.textContent = t(sun && mon ? "msgBoth" : sun ? "msgSundayOnly" : mon ? "msgMondayOnly" : "msgNone", n);
-      mood.hidden = false;
-    } else {
-      mood.hidden = true;
-    }
 
     // Grazie
     var anyoneComing = any("sun", true) || any("mon", true);
