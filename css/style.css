@@ -237,6 +237,7 @@ legend { padding: 0; margin-bottom: 14px; font-family: var(--serif); font-size: 
 .thanks figure { margin: 8px 0 0; max-width: 420px; }
 .thanks figure img { border-radius: 6px; }
 .thanks figcaption { margin-top: 8px; font-size: 14px; font-style: italic; color: var(--navy-soft); }
+.thanks-actions { justify-content: center; }
 
 .symbols { display: flex; justify-content: center; align-items: flex-end; gap: 10px; color: var(--navy); }
 .symbols svg { width: 52px; height: 52px; }

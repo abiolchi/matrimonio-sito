@@ -95,6 +95,7 @@ window.TRANSLATIONS = {
     altWedding: "Acquerello di un matrimonio nel giardino di una villa sul golfo di Lerici",
     imgCaption: "Questa immagine non rispecchia affatto la realtà",
     editAnswers: "Modifica le risposte",
+    backHome: "Torna alla home",
 
     footer: "Con amore, Alice & Max",
     credits: "Realizzato da Alice, Max con l'aiuto di Claude",
@@ -175,6 +176,7 @@ window.TRANSLATIONS = {
     altWedding: "Aquarelle d'un mariage dans le jardin d'une villa sur le golfe de Lerici",
     imgCaption: "Cette image ne reflète pas du tout la réalité",
     editAnswers: "Modifier les réponses",
+    backHome: "Retour à l'accueil",
 
     footer: "Avec amour, Alice & Max",
     credits: "Réalisé par Alice et Max avec l'aide de Claude",
@@ -254,6 +256,7 @@ window.TRANSLATIONS = {
     altWedding: "Watercolour of a wedding in the garden of a villa on the Gulf of Lerici",
     imgCaption: "This image does not reflect reality at all",
     editAnswers: "Change my answers",
+    backHome: "Back to home",
 
     footer: "With love, Alice & Max",
     credits: "Made by Alice and Max with help from Claude",
