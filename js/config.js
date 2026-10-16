@@ -7,5 +7,5 @@
    ========================================================= */
 
 window.RSVP_CONFIG = {
-  endpoint: ""
+  endpoint: "https://script.google.com/macros/s/AKfycbxwLz1Hx73wcOQtGQdcCOK7nOjv7N1a4Jv9vuILEX0J4i_zeDZgBoY14-SGdWXNwSg/exec"
 };
