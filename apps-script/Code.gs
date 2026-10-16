@@ -21,7 +21,7 @@ var SHEET_LOG = 'Storico';
 var SHEET_SUMMARY = 'Riepilogo';
 
 var GUEST_HEADERS = ['Codice', 'Nomi (separati da ;)', 'Lingua (it / fr / en)', 'Invitati al civile (sì / no)', 'Note (private)'];
-var ANSWER_HEADERS = ['Data risposta', 'Codice', 'Nome', 'Domenica 19/9 – cerimonia e ricevimento', 'Lunedì 20/9 – matrimonio civile', 'Lingua'];
+var ANSWER_HEADERS = ['Data risposta', 'Codice', 'Nome', 'Domenica 19/9 – cerimonia e ricevimento', 'Lunedì 20/9 – matrimonio civile', 'Lingua', '+1 (accompagnatore)'];
 var LOG_HEADERS = ['Data', 'Codice', 'Azione', 'Dettaglio (JSON)'];
 
 // Invitati di prova: gli stessi della modalità di prova del sito.
@@ -60,7 +60,7 @@ function setupSheets() {
   guests.setColumnWidth(1, 130).setColumnWidth(2, 260).setColumnWidth(3, 140).setColumnWidth(4, 200).setColumnWidth(5, 240);
 
   var answers = getOrCreateSheet_(ss, SHEET_ANSWERS, ANSWER_HEADERS);
-  answers.setColumnWidth(1, 150).setColumnWidth(3, 160).setColumnWidth(4, 260).setColumnWidth(5, 240);
+  answers.setColumnWidth(1, 150).setColumnWidth(3, 160).setColumnWidth(4, 260).setColumnWidth(5, 240).setColumnWidth(7, 160);
 
   getOrCreateSheet_(ss, SHEET_LOG, LOG_HEADERS).setColumnWidth(4, 500);
 
@@ -68,11 +68,12 @@ function setupSheets() {
   var rows = [
     ['Inviti (nuclei)', '=COUNTA(Invitati!A2:A)'],
     ['Persone invitate', '=SUMPRODUCT((LEN(TRIM(Invitati!B2:B))>0)*(LEN(Invitati!B2:B)-LEN(SUBSTITUTE(Invitati!B2:B;";";""))+1))'],
-    ['Inviti che hanno risposto', '=IFERROR(COUNTUNIQUE(FILTER(Risposte!B2:B;Risposte!B2:B<>""));0)'],
+    ['Inviti che hanno risposto', '=COUNTUNIQUEIFS(Risposte!B2:B;Risposte!B2:B;"<>")'],
     ['Domenica – ci saranno', '=COUNTIF(Risposte!D2:D;"Sì")'],
     ['Domenica – non ci saranno', '=COUNTIF(Risposte!D2:D;"No")'],
     ['Lunedì (civile) – ci saranno', '=COUNTIF(Risposte!E2:E;"Sì")'],
-    ['Lunedì (civile) – non ci saranno', '=COUNTIF(Risposte!E2:E;"No")']
+    ['Lunedì (civile) – non ci saranno', '=COUNTIF(Risposte!E2:E;"No")'],
+    ['Accompagnatori (+1)', '=COUNTIF(Risposte!G2:G;"Sì")']
   ];
   // Formule col ";" come separatore, perché il foglio è in italiano.
   // Se un giorno il foglio passa a una lingua con la virgola (es. inglese), vanno cambiati in ",".
@@ -157,17 +158,26 @@ function save_(data) {
   }
   if (isClosed_()) return { ok: false, error: 'closed' };
 
-  // Controlla che le persone corrispondano all'invito e che ogni risposta sia valida
+  // Controlla che le persone corrispondano all'invito e che ogni risposta sia valida.
+  // Chi è invitato da solo può aggiungere un accompagnatore (+1), con il suo nome.
   var people = Array.isArray(data.people) ? data.people : [];
-  if (people.length !== guest.names.length) return { ok: false, error: 'invalid' };
-  var byName = {};
+  var byName = {}, plus = null, listed = 0;
   for (var i = 0; i < people.length; i++) {
     var person = people[i] || {};
-    if (guest.names.indexOf(person.name) === -1 || byName[person.name]) return { ok: false, error: 'invalid' };
     if (typeof person.sunday !== 'boolean') return { ok: false, error: 'invalid' };
     if (guest.civil && typeof person.monday !== 'boolean') return { ok: false, error: 'invalid' };
+    if (person.plusOne) {
+      if (plus || guest.names.length !== 1) return { ok: false, error: 'invalid' };
+      var plusName = String(person.name || '').trim().slice(0, 100);
+      if (!plusName) return { ok: false, error: 'invalid' };
+      plus = { name: plusName, sunday: person.sunday, monday: person.monday };
+      continue;
+    }
+    if (guest.names.indexOf(person.name) === -1 || byName[person.name]) return { ok: false, error: 'invalid' };
     byName[person.name] = person;
+    listed++;
   }
+  if (listed !== guest.names.length) return { ok: false, error: 'invalid' };
 
   var lang = LANGS.indexOf(data.lang) > -1 ? data.lang : guest.lang;
   var now = new Date();
@@ -179,17 +189,19 @@ function save_(data) {
     var sheet = ss.getSheetByName(SHEET_ANSWERS);
     var hadAnswers = deleteAnswerRows_(sheet, guest.code);
 
-    var rows = guest.names.map(function (name) {
-      var p = byName[name];
+    var row = function (name, p, isPlus) {
       return [
         now,
         guest.code,
         name,
         p.sunday ? 'Sì' : 'No',
         guest.civil ? (p.monday ? 'Sì' : 'No') : '—',
-        lang
+        lang,
+        isPlus ? 'Sì' : ''
       ];
-    });
+    };
+    var rows = guest.names.map(function (name) { return row(name, byName[name], false); });
+    if (plus) rows.push(row(safeText_(plus.name), plus, true));
     sheet.getRange(sheet.getLastRow() + 1, 1, rows.length, rows[0].length).setValues(rows);
 
     ss.getSheetByName(SHEET_LOG).appendRow([
@@ -235,11 +247,13 @@ function readAnswers_(code) {
   var people = [], updatedAt = null;
   values.forEach(function (r) {
     if (String(r[1]) !== code) return;
-    people.push({
-      name: String(r[2]),
+    var person = {
+      name: String(r[2]).replace(/^'/, ''),
       sunday: r[3] === 'Sì' ? true : r[3] === 'No' ? false : null,
       monday: r[4] === 'Sì' ? true : r[4] === 'No' ? false : null
-    });
+    };
+    if (r[6] === 'Sì') person.plusOne = true;
+    people.push(person);
     if (r[0] instanceof Date) updatedAt = r[0].toISOString();
   });
   return people.length ? { updatedAt: updatedAt, people: people } : null;

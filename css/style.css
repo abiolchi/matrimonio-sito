@@ -1,5 +1,5 @@
 /* =========================================================
-   Max & Alice · Lerici 2027 — stile "Limoni"
+   Alice & Max · Lerici 2027 — stile "Limoni"
    I colori e i font principali sono tutti qui sotto in :root
    ========================================================= */
 
@@ -211,6 +211,13 @@ legend { padding: 0; margin-bottom: 14px; font-family: var(--serif); font-size: 
 .choice input:checked + span { background: var(--navy); border-color: var(--navy); color: var(--cream); }
 .choice input[value="no"]:checked + span { background: var(--navy-soft); border-color: var(--navy-soft); }
 .choice input:focus-visible + span { outline: 2px solid var(--navy); outline-offset: 2px; }
+
+/* +1 per chi è invitato da solo */
+.plus { margin-top: 10px; display: flex; flex-direction: column; gap: 12px; }
+.check { display: inline-flex; align-items: center; gap: 10px; min-height: 44px; cursor: pointer; font-weight: 500; }
+.check input { width: 22px; height: 22px; margin: 0; accent-color: var(--navy); cursor: pointer; }
+.check:has(input:disabled) { cursor: not-allowed; }
+.check input:disabled, .check input:disabled + span { opacity: .4; cursor: not-allowed; }
 
 /* messaggio sotto ogni persona, secondo la sua risposta */
 .feedback {

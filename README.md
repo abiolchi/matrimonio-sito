@@ -41,7 +41,7 @@ Finché `js/config.js` ha `endpoint: ""`, il modulo usa 4 invitati finti e le ri
 | Codice | Invitati | Lingua | Civile |
 |---|---|---|---|
 | `LIMONE-4K7` | Giulia, Marco | it | sì |
-| `ONDA-9RT` | Claire | fr | no |
+| `ONDA-9RT` | Claire | fr | sì |
 | `VELA-3MX` | Luca, Sara, Tommaso | it | sì |
 | `SOLE-8PW` | Emma, James | en | sì |
 

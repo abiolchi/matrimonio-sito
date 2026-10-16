@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Max &amp; Alice · 19.09.2027 · Lerici</title>
-  <meta name="description" content="Max & Alice · 19 settembre 2027 · Lerici">
+  <title>Alice &amp; Max · 19.09.2027 · Lerici</title>
+  <meta name="description" content="Alice & Max · 19 settembre 2027 · Lerici">
   <meta name="theme-color" content="#FBF7EE">
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -15,7 +15,7 @@
 <body>
 
 <header class="wrap top">
-  <a class="mono" href="#top" aria-label="Max &amp; Alice">M &amp; A</a>
+  <a class="mono" href="#top" aria-label="Alice &amp; Max">M &amp; A</a>
   <nav aria-label="Menu">
     <a href="#day" data-i18n="navDay">Programma</a>
     <a href="#travel" data-i18n="navTravel">Viaggio e alloggio</a>
@@ -40,7 +40,7 @@
         <path d="M20 112 Q47 102 74 112 T128 112 T182 112 T236 112" fill="none" stroke="#1F3A5F" stroke-width="2" opacity="0.5"/>
       </svg>
       <div class="kicker" data-i18n="kicker">Ci sposiamo</div>
-      <h1 class="names">Max &amp; Alice</h1>
+      <h1 class="names">Alice &amp; Max</h1>
       <div class="date" data-i18n="date">Domenica 19 settembre 2027</div>
       <div class="place" data-i18n="place">Lerici · Golfo dei Poeti</div>
       <p class="intro" data-i18n="intro">Saremmo felici di festeggiare con voi in riva al mare, in Liguria. Qui troverete tutte le informazioni, che aggiorneremo man mano.</p>
@@ -148,6 +148,18 @@
           <fieldset>
             <legend id="q1"></legend>
             <div id="rows-sun" class="people"></div>
+            <!-- +1: solo per gli inviti con una persona; segnarlo qui vuol dire che viene domenica -->
+            <div id="plus-box-sun" class="plus" hidden>
+              <label class="check">
+                <input type="checkbox" id="plus-on-sun">
+                <span data-i18n="plusLabel">Porto un accompagnatore (+1)</span>
+              </label>
+              <div id="plus-fields-sun" class="field" hidden>
+                <label for="plus-name-sun" data-i18n="plusNameLabel">Nome e cognome dell'accompagnatore</label>
+                <input id="plus-name-sun" type="text" maxlength="100" autocomplete="off" aria-describedby="err-plus-sun">
+                <div id="err-plus-sun" class="error" role="alert" data-i18n="errPlusName" hidden>Scrivi il nome dell'accompagnatore.</div>
+              </div>
+            </div>
           </fieldset>
           <div id="err-sun" class="error" role="alert" data-i18n="errAnswerAll" hidden>Rispondi per ogni persona.</div>
           <div class="actions">
@@ -174,6 +186,18 @@
           <fieldset>
             <legend id="q2"></legend>
             <div id="rows-mon" class="people"></div>
+            <!-- +1 solo per il civile: compare se non è stato segnato nella Parte 1 -->
+            <div id="plus-box-mon" class="plus" hidden>
+              <label class="check">
+                <input type="checkbox" id="plus-on-mon">
+                <span data-i18n="plusLabel">Porto un accompagnatore (+1)</span>
+              </label>
+              <div id="plus-fields-mon" class="field" hidden>
+                <label for="plus-name-mon" data-i18n="plusNameLabel">Nome e cognome dell'accompagnatore</label>
+                <input id="plus-name-mon" type="text" maxlength="100" autocomplete="off" aria-describedby="err-plus-mon">
+                <div id="err-plus-mon" class="error" role="alert" data-i18n="errPlusName" hidden>Scrivi il nome dell'accompagnatore.</div>
+              </div>
+            </div>
           </fieldset>
           <div id="err-mon" class="error" role="alert" data-i18n="errAnswerAll" hidden>Rispondi per ogni persona.</div>
           <div class="actions">
@@ -213,7 +237,7 @@
 
 </main>
 
-<footer data-i18n="footer">Con amore, Max &amp; Alice</footer>
+<footer data-i18n="footer">Con amore, Alice &amp; Max</footer>
 
 <script src="js/config.js"></script>
 <script src="js/i18n.js"></script>

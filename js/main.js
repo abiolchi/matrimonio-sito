@@ -103,7 +103,8 @@
   // Gli stessi 4 invitati di prova creati nel Google Sheet da "Prepara il foglio"
   var DEMO_GUESTS = [
     { code: "LIMONE-4K7", names: ["Giulia", "Marco"], lang: "it", civil: true },
-    { code: "ONDA-9RT", names: ["Claire"], lang: "fr", civil: false },
+    { code: "ONDA-9RT", names: ["Claire"], lang: "fr", civil: true },
+    { code: "VILLA-2G3", names: ["Alice"], lang: "en", civil: false},
     { code: "VELA-3MX", names: ["Luca", "Sara", "Tommaso"], lang: "it", civil: true },
     { code: "SOLE-8PW", names: ["Emma", "James"], lang: "en", civil: true }
   ];
@@ -151,6 +152,10 @@
     guest: null,      // { code, names[], lang, civil }
     previous: null,   // risposte già date
     ans: [],          // per persona: { sun: true/false/null, mon: true/false/null }
+    // accompagnatore (+1), solo per gli inviti con una persona:
+    // where "sun" = segnato nella Parte 1 → viene domenica; lunedì risponde con la sua riga (mon)
+    // where "mon" = segnato solo nella Parte 2 → viene solo lunedì
+    plus: { where: null, name: "", mon: null },
     step: "code"      // "code" | "part1" | "part2" | "thanks"
   };
 
@@ -221,17 +226,23 @@
     state.guest = res.guest;
     state.previous = res.previous || null;
     state.ans = res.guest.names.map(function () { return { sun: null, mon: null }; });
+    state.plus = { where: null, name: "", mon: null };
 
     if (state.previous && state.previous.people) {
       state.previous.people.forEach(function (p) {
+        if (p.plusOne) {
+          if (p.sunday) state.plus = { where: "sun", name: p.name, mon: p.monday };
+          else if (p.monday) state.plus = { where: "mon", name: p.name, mon: true };
+          return;
+        }
         var i = state.guest.names.indexOf(p.name);
         if (i > -1) state.ans[i] = { sun: p.sunday, mon: p.monday };
       });
     }
+    if (!canBringPlus()) state.plus.where = null;
     $("website").value = "";
 
-    buildRows("rows-sun", "sun");
-    buildRows("rows-mon", "mon");
+    buildAllRows();
     hideErrors();
 
     // Lingua dell'invito, se l'ospite non ne ha scelta una
@@ -242,55 +253,134 @@
 
   /* ---------- Righe per persona ---------- */
 
+  function canBringPlus() { return state.guest.names.length === 1; }
+
+  function plusName() { return state.plus.name.trim() || t("plusDefault"); }
+
+  function buildAllRows() {
+    buildRows("rows-sun", "sun");
+    buildRows("rows-mon", "mon");
+    // il +1 segnato domenica risponde per lunedì con la sua riga
+    if (state.plus.where === "sun") {
+      $("rows-mon").appendChild(makeRow("mon", state.ans.length, plusName(),
+        function () { return state.plus.mon; },
+        function (v) { state.plus.mon = v; }));
+    }
+    var where = state.plus.where;
+    $("plus-box-sun").hidden = !canBringPlus();
+    $("plus-box-mon").hidden = !canBringPlus() || where === "sun";
+    ["sun", "mon"].forEach(function (part) {
+      $("plus-on-" + part).checked = where === part;
+      $("plus-fields-" + part).hidden = where !== part;
+      $("plus-name-" + part).value = state.plus.name;
+    });
+  }
+
   function buildRows(containerId, part) {
     var box = $(containerId);
     box.textContent = "";
     state.guest.names.forEach(function (name, i) {
-      var row = document.createElement("div");
-      row.className = "person";
-
-      var label = document.createElement("span");
-      label.className = "person-name";
-      label.id = part + "-name-" + i;
-      label.textContent = name; // textContent: i nomi dal foglio non vengono mai interpretati come HTML
-
-      var group = document.createElement("div");
-      group.className = "choice";
-      group.setAttribute("role", "radiogroup");
-      group.setAttribute("aria-labelledby", label.id);
-
-      ["yes", "no"].forEach(function (value) {
-        var opt = document.createElement("label");
-        var input = document.createElement("input");
-        input.type = "radio";
-        input.name = part + "-" + i;
-        input.value = value;
-        input.checked = state.ans[i][part] === (value === "yes");
-        input.addEventListener("change", function () {
-          state.ans[i][part] = value === "yes";
-          $(part === "sun" ? "err-sun" : "err-mon").hidden = true;
-          render();
-        });
-        var text = document.createElement("span");
-        text.dataset.i18n = value === "yes" ? "yesOpt" : "noOpt";
-        text.textContent = t(text.dataset.i18n);
-        opt.appendChild(input);
-        opt.appendChild(text);
-        group.appendChild(opt);
-      });
-
-      // messaggio per questa persona, riempito da render()
-      var feedback = document.createElement("p");
-      feedback.className = "feedback";
-      feedback.id = part + "-fb-" + i;
-      feedback.setAttribute("role", "status");
-      feedback.hidden = true;
-
-      row.appendChild(label);
-      row.appendChild(group);
-      row.appendChild(feedback);
-      box.appendChild(row);
+      box.appendChild(makeRow(part, i, name,
+        function () { return state.ans[i][part]; },
+        function (v) { state.ans[i][part] = v; }));
     });
+  }
+
+  function makeRow(part, i, name, get, set) {
+    var row = document.createElement("div");
+    row.className = "person";
+
+    var label = document.createElement("span");
+    label.className = "person-name";
+    label.id = part + "-name-" + i;
+    label.textContent = name; // textContent: i nomi non vengono mai interpretati come HTML
+
+    var group = document.createElement("div");
+    group.className = "choice";
+    group.setAttribute("role", "radiogroup");
+    group.setAttribute("aria-labelledby", label.id);
+
+    ["yes", "no"].forEach(function (value) {
+      var opt = document.createElement("label");
+      var input = document.createElement("input");
+      input.type = "radio";
+      input.name = part + "-" + i;
+      input.value = value;
+      input.checked = get() === (value === "yes");
+      input.addEventListener("change", function () {
+        set(value === "yes");
+        $(part === "sun" ? "err-sun" : "err-mon").hidden = true;
+        render();
+      });
+      var text = document.createElement("span");
+      text.dataset.i18n = value === "yes" ? "yesOpt" : "noOpt";
+      text.textContent = t(text.dataset.i18n);
+      opt.appendChild(input);
+      opt.appendChild(text);
+      group.appendChild(opt);
+    });
+
+    // messaggio per questa persona, riempito da render()
+    var feedback = document.createElement("p");
+    feedback.className = "feedback";
+    feedback.id = part + "-fb-" + i;
+    feedback.setAttribute("role", "status");
+    feedback.hidden = true;
+
+    row.appendChild(label);
+    row.appendChild(group);
+    row.appendChild(feedback);
+    return row;
+  }
+
+  /* ---------- +1 ---------- */
+
+  ["sun", "mon"].forEach(function (part) {
+    $("plus-on-" + part).addEventListener("change", function () {
+      if (this.checked) {
+        // segnato domenica: viene domenica; se era già segnato per lunedì, resta sì anche lunedì
+        state.plus.mon = part === "sun" ? (state.plus.where === "mon" ? true : null) : true;
+        state.plus.where = part;
+      } else {
+        state.plus.where = null;
+      }
+      $("err-plus-" + part).hidden = true;
+      buildAllRows();
+      render();
+      if (this.checked) $("plus-name-" + part).focus();
+    });
+
+    $("plus-name-" + part).addEventListener("input", function () {
+      state.plus.name = this.value;
+      $("err-plus-" + part).hidden = true;
+      render();
+    });
+  });
+
+  // Il +1 si può segnare solo se l'invitato viene a quell'evento; prima il tick è chiaro e bloccato.
+  // Se l'invitato passa a "no", il tick si toglie (il nome resta, nel caso ci ripensi).
+  function syncPlus() {
+    if (!canBringPlus()) return;
+    var guest = state.ans[0];
+    var changed = false;
+    ["sun", "mon"].forEach(function (part) {
+      var allowed = guest[part] === true;
+      $("plus-on-" + part).disabled = !allowed;
+      if (!allowed && state.plus.where === part) {
+        state.plus.where = null;
+        $("err-plus-" + part).hidden = true;
+        changed = true;
+      }
+    });
+    if (changed) buildAllRows();
+  }
+
+  // true (e mostra l'errore) se il +1 è segnato in questa parte ma manca il nome
+  function plusNameMissing(part) {
+    if (state.plus.where !== part || state.plus.name.trim()) return false;
+    $("err-plus-" + part).hidden = false;
+    $("plus-name-" + part).focus();
+    return true;
   }
 
   function values(part) { return state.ans.map(function (a) { return a[part]; }); }
@@ -298,7 +388,7 @@
   function any(part, v) { return values(part).some(function (x) { return x === v; }); }
 
   function hideErrors() {
-    ["err-sun", "err-mon", "send-error"].forEach(function (id) { $(id).hidden = true; });
+    ["err-sun", "err-mon", "err-plus-sun", "err-plus-mon", "send-error"].forEach(function (id) { $(id).hidden = true; });
   }
 
   /* ---------- Navigazione tra i passi ---------- */
@@ -316,6 +406,7 @@
   }
 
   $("next-btn").addEventListener("click", function () {
+    if (plusNameMissing("sun")) return;
     if (!allAnswered("sun")) { $("err-sun").hidden = false; return; }
     go("part2", $("q2"));
   });
@@ -340,18 +431,25 @@
   form.addEventListener("submit", function (e) {
     e.preventDefault();
     hideErrors();
-    if (!allAnswered("sun")) { go("part1"); $("err-sun").hidden = false; return; }
-    if (state.guest.civil && !allAnswered("mon")) { $("err-mon").hidden = false; return; }
-
     var civil = state.guest.civil;
-    var payload = {
-      code: state.guest.code,
-      lang: current,
-      website: $("website").value,
-      people: state.guest.names.map(function (name, i) {
-        return { name: name, sunday: state.ans[i].sun, monday: civil ? state.ans[i].mon : null };
-      })
-    };
+    var where = state.plus.where;
+    if (where === "sun" && !state.plus.name.trim()) { go("part1"); plusNameMissing("sun"); return; }
+    if (!allAnswered("sun")) { go("part1"); $("err-sun").hidden = false; return; }
+    if (civil && (!allAnswered("mon") || (where === "sun" && state.plus.mon === null))) { $("err-mon").hidden = false; return; }
+    if (plusNameMissing("mon")) return;
+
+    var people = state.guest.names.map(function (name, i) {
+      return { name: name, sunday: state.ans[i].sun, monday: civil ? state.ans[i].mon : null };
+    });
+    if (where) {
+      people.push({
+        name: state.plus.name.trim(),
+        sunday: where === "sun",
+        monday: civil ? (where === "mon" || state.plus.mon) : null,
+        plusOne: true
+      });
+    }
+    var payload = { code: state.guest.code, lang: current, website: $("website").value, people: people };
 
     var buttons = [$("send-btn-1"), $("send-btn-2")];
     buttons.forEach(function (b) { setBusy(b, true, "sending"); });
@@ -389,8 +487,15 @@
     already.hidden = !(state.previous && state.previous.updatedAt);
     if (!already.hidden) already.textContent = fill(t("already", n), { date: formatDate(state.previous.updatedAt) });
 
+    syncPlus();
+
     $("q1").textContent = t("q1", n);
-    $("q2").textContent = t("q2", n);
+    // con il +1 segnato domenica, la domanda sul civile passa al plurale
+    $("q2").textContent = t("q2", n + (state.plus.where === "sun" ? 1 : 0));
+
+    // nome del +1 nella sua riga del lunedì, aggiornato se lo si cambia
+    var plusLabel = $("mon-name-" + state.ans.length);
+    if (plusLabel) plusLabel.textContent = plusName();
 
     // Messaggio sotto ogni persona, secondo la sua risposta
     state.ans.forEach(function (a, i) {
@@ -403,6 +508,11 @@
       }
       showFeedback($("mon-fb-" + i), monKey);
     });
+    // il +1 segnato domenica viene domenica: "che bello" oppure "solo domenica"
+    if (state.plus.where === "sun") {
+      var pm = state.plus.mon;
+      showFeedback($("mon-fb-" + state.ans.length), pm === null ? null : pm ? "msgBoth" : "msgSundayOnly");
+    }
 
     // Parte 1: "Avanti" se c'è la Parte 2, altrimenti "Invia"
     $("next-btn").hidden = !civil;

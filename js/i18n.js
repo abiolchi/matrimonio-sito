@@ -74,6 +74,10 @@ window.TRANSLATIONS = {
     msgSundayOnly: "Capiamo… è tanto! Siamo felicissimi di averti con noi domenica!!",
     msgMondayOnly: "Allora ci vediamo lunedì al castello!",
     msgNone: "🤌🏼🤌🏼🤌🏼🤌🏼🤌🏼🤌🏼🤌🏼🤌🏼🤌🏼 Clicca su «Invia», così registriamo comunque la tua risposta ❤",
+    plusLabel: "Porto un accompagnatore (+1)",
+    plusNameLabel: "Nome e cognome dell'accompagnatore",
+    plusDefault: "+1",
+    errPlusName: "Scrivi il nome dell'accompagnatore.",
     errAnswerAll: "Rispondi per ogni persona.",
     next: "Avanti",
     back: "Indietro",
@@ -92,7 +96,7 @@ window.TRANSLATIONS = {
     imgCaption: "Questa immagine non rispecchia affatto la realtà",
     editAnswers: "Modifica le risposte",
 
-    footer: "Con amore, Max & Alice"
+    footer: "Con amore, Alice & Max"
   },
 
   fr: {
@@ -151,6 +155,10 @@ window.TRANSLATIONS = {
     msgSundayOnly: "On comprend… ça fait beaucoup ! Nous sommes ravis de vous avoir avec nous dimanche !!",
     msgMondayOnly: "Alors on se voit lundi au château !",
     msgNone: "🤌🏼🤌🏼🤌🏼🤌🏼🤌🏼🤌🏼🤌🏼🤌🏼🤌🏼 Cliquez sur « Envoyer » pour que nous enregistrions quand même votre réponse ❤",
+    plusLabel: "Je viens accompagné(e) (+1)",
+    plusNameLabel: "Prénom et nom de votre accompagnant(e)",
+    plusDefault: "+1",
+    errPlusName: "Indiquez le nom de votre accompagnant(e).",
     errAnswerAll: "Répondez pour chaque personne.",
     next: "Suivant",
     back: "Retour",
@@ -166,7 +174,7 @@ window.TRANSLATIONS = {
     imgCaption: "Cette image ne reflète pas du tout la réalité",
     editAnswers: "Modifier les réponses",
 
-    footer: "Avec amour, Max & Alice"
+    footer: "Avec amour, Alice & Max"
   },
 
   en: {
@@ -224,6 +232,10 @@ window.TRANSLATIONS = {
     msgSundayOnly: "We understand… it's a lot! We're so happy you'll be with us on Sunday!!",
     msgMondayOnly: "Then see you on Monday at the castle!",
     msgNone: "🤌🏼🤌🏼🤌🏼🤌🏼🤌🏼🤌🏼🤌🏼🤌🏼🤌🏼 Please click \"Send\" so we still register your answer ❤",
+    plusLabel: "I'm bringing a guest (+1)",
+    plusNameLabel: "Your guest's full name",
+    plusDefault: "+1",
+    errPlusName: "Please enter your guest's name.",
     errAnswerAll: "Please answer for each person.",
     next: "Next",
     back: "Back",
@@ -239,6 +251,6 @@ window.TRANSLATIONS = {
     imgCaption: "This image does not reflect reality at all",
     editAnswers: "Change my answers",
 
-    footer: "With love, Max & Alice"
+    footer: "With love, Alice & Max"
   }
 };

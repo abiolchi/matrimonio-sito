@@ -20,6 +20,10 @@ Leggi anche README.md e apps-script/GUIDA.md.
   - Il flusso ricalca il vecchio modulo Tally "RSVP - Wedding of Alice & Max" (id eq1dQ0):
     1. Parte 1 (domenica): sì/no per persona; sotto ogni persona compare un riquadro giallo (sunYes / sunNo "Perché?? 🤌🏼"). Niente messaggio libero.
     2. Parte 2 (civile): solo se l'invito ha "Invitati al civile = sì"; sotto ogni persona un messaggio secondo la sua combinazione domenica+lunedì (msgBoth / msgSundayOnly / msgMondayOnly / msgNone).
+    +1: ogni invito con una sola persona può mettere il tick "+1" e scrivere il nome dell'accompagnatore (obbligatorio).
+      Tick nella Parte 1 → il +1 viene domenica (niente sì/no); nella Parte 2 ha la sua riga sì/no per il civile.
+      Nessun tick nella Parte 1 → nella Parte 2 ricompare il tick: se lo mette, il +1 viene solo lunedì.
+      Il tick è chiaro e bloccato finché l'invitato non risponde "Ci sarò" a quell'evento; se passa a "no" si toglie da solo. In Risposte è una riga in più con "Sì" nella colonna G "+1 (accompagnatore)".
     3. Grazie: simboli di Lerici in SVG e l'acquerello con la didascalia "non rispecchia la realtà".
 - Sicurezza: la lista non sta mai nel codice del sito; i codici sono casuali; blocco dopo 50 codici sbagliati in 10 minuti; campo trappola per i bot; testi protetti dall'interpretazione come formule.
 
