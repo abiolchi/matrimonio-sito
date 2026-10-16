@@ -83,6 +83,7 @@ window.TRANSLATIONS = {
     back: "Indietro",
     send: "Invia",
     sending: "Invio in corso…",
+    slowWait: "Un attimo, ci vuole qualche secondo…",
     errSend: "Qualcosa è andato storto. Riprova tra poco.",
 
     /* RSVP – grazie */
@@ -167,6 +168,7 @@ window.TRANSLATIONS = {
     back: "Retour",
     send: "Envoyer",
     sending: "Envoi en cours…",
+    slowWait: "Un instant, cela peut prendre quelques secondes…",
     errSend: "Une erreur est survenue. Réessayez dans un instant.",
 
     thanksTitle: "Vos réponses ont bien été enregistrées !",
@@ -247,6 +249,7 @@ window.TRANSLATIONS = {
     back: "Back",
     send: "Send",
     sending: "Sending…",
+    slowWait: "Just a moment, this can take a few seconds…",
     errSend: "Something went wrong. Please try again shortly.",
 
     thanksTitle: "Your answers have been registered!",

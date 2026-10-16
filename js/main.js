@@ -88,7 +88,16 @@
   function normalizeCode(s) { return String(s || "").toUpperCase().replace(/[^A-Z0-9]/g, ""); }
 
   function remoteApi(url) {
+    // Google spegne lo script dopo qualche minuto di inattività e la riaccensione
+    // può richiedere 5–10 secondi: una richiesta "sveglia" in anticipo (al massimo
+    // una ogni 3 minuti) fa sì che, quando l'invitato preme il pulsante, sia già pronto.
+    var lastWarm = 0;
     return {
+      warm: function () {
+        if (Date.now() - lastWarm < 180000) return;
+        lastWarm = Date.now();
+        fetch(url).catch(function () {});
+      },
       lookup: function (code) {
         return fetch(url + "?action=lookup&code=" + encodeURIComponent(code)).then(function (r) { return r.json(); });
       },
@@ -143,6 +152,13 @@
 
   var isDemo = !CFG.endpoint;
   var api = isDemo ? demoApi() : remoteApi(CFG.endpoint);
+  if (api.warm) {
+    api.warm();
+    // mentre l'invitato compila (anche a lungo), lo script resta sveglio
+    ["code-form", "rsvp-form"].forEach(function (id) {
+      ["focusin", "click"].forEach(function (ev) { $(id).addEventListener(ev, api.warm); });
+    });
+  }
 
   /* =========================================================
      RSVP
@@ -172,6 +188,12 @@
     el.dataset.i18n = key;
     el.textContent = t(key);
     el.hidden = false;
+  }
+
+  // Mostra "Un attimo…" se la risposta tarda più di 1,5 secondi; restituisce la funzione per nasconderlo
+  function slowNote(el) {
+    var timer = setTimeout(function () { el.hidden = false; }, 1500);
+    return function () { clearTimeout(timer); el.hidden = true; };
   }
 
   function setBusy(btn, busy, key) {
@@ -210,6 +232,7 @@
     if (!code) { showError(codeErr, "errCodeEmpty"); codeInput.focus(); return; }
     codeErr.hidden = true;
     setBusy(codeBtn, true, "codeChecking");
+    var hideWait = slowNote($("code-wait"));
 
     api.lookup(code)
       .then(function (res) {
@@ -219,7 +242,7 @@
         codeInput.focus();
       })
       .catch(function () { showError(codeErr, "errNetwork"); })
-      .then(function () { setBusy(codeBtn, false, "codeBtn"); });
+      .then(function () { hideWait(); setBusy(codeBtn, false, "codeBtn"); });
   }
 
   function openGuest(res) {
@@ -453,6 +476,7 @@
 
     var buttons = [$("send-btn-1"), $("send-btn-2")];
     buttons.forEach(function (b) { setBusy(b, true, "sending"); });
+    var hideWait = slowNote($("send-wait"));
 
     api.save(payload)
       .then(function (res) {
@@ -464,7 +488,7 @@
         showError($("send-error"), res && res.error === "closed" ? "errClosed" : "errSend");
       })
       .catch(function () { showError($("send-error"), "errNetwork"); })
-      .then(function () { buttons.forEach(function (b) { setBusy(b, false, "send"); }); });
+      .then(function () { hideWait(); buttons.forEach(function (b) { setBusy(b, false, "send"); }); });
   });
 
   /* ---------- Testi che dipendono dall'invito e dalle risposte ---------- */
