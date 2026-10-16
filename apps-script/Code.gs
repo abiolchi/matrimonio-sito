@@ -67,13 +67,15 @@ function setupSheets() {
   var summary = getOrCreateSheet_(ss, SHEET_SUMMARY, ['Voce', 'Numero']);
   var rows = [
     ['Inviti (nuclei)', '=COUNTA(Invitati!A2:A)'],
-    ['Persone invitate', '=SUMPRODUCT((LEN(TRIM(Invitati!B2:B))>0)*(LEN(Invitati!B2:B)-LEN(SUBSTITUTE(Invitati!B2:B,";",""))+1))'],
-    ['Inviti che hanno risposto', '=IFERROR(COUNTUNIQUE(FILTER(Risposte!B2:B,Risposte!B2:B<>"")),0)'],
-    ['Domenica – ci saranno', '=COUNTIF(Risposte!D2:D,"Sì")'],
-    ['Domenica – non ci saranno', '=COUNTIF(Risposte!D2:D,"No")'],
-    ['Lunedì (civile) – ci saranno', '=COUNTIF(Risposte!E2:E,"Sì")'],
-    ['Lunedì (civile) – non ci saranno', '=COUNTIF(Risposte!E2:E,"No")']
+    ['Persone invitate', '=SUMPRODUCT((LEN(TRIM(Invitati!B2:B))>0)*(LEN(Invitati!B2:B)-LEN(SUBSTITUTE(Invitati!B2:B;";";""))+1))'],
+    ['Inviti che hanno risposto', '=IFERROR(COUNTUNIQUE(FILTER(Risposte!B2:B;Risposte!B2:B<>""));0)'],
+    ['Domenica – ci saranno', '=COUNTIF(Risposte!D2:D;"Sì")'],
+    ['Domenica – non ci saranno', '=COUNTIF(Risposte!D2:D;"No")'],
+    ['Lunedì (civile) – ci saranno', '=COUNTIF(Risposte!E2:E;"Sì")'],
+    ['Lunedì (civile) – non ci saranno', '=COUNTIF(Risposte!E2:E;"No")']
   ];
+  // Formule col ";" come separatore, perché il foglio è in italiano.
+  // Se un giorno il foglio passa a una lingua con la virgola (es. inglese), vanno cambiati in ",".
   summary.getRange(2, 1, rows.length, 2).setValues(rows);
   summary.setColumnWidth(1, 260);
 
