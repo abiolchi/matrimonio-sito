@@ -16,7 +16,7 @@ window.STD_TRANSLATIONS = {
     /* Apertura */
     kicker: "Save the date",
     place: "Lerici · Golfo dei Poeti",
-    joyText: "La nostra gioia più grande sarebbe avervi tutti con noi in questo giorno importante. Non vediamo l'ora di festeggiare insieme!",
+    joyText: "Saremmo felicissimi di avervi con noi a festeggiare questo giorno, non vediamo l'ora!",
     nbLabel: "NB:",
     nbText: "compilare questo modulo non conferma ufficialmente la vostra presenza: ci serve solo per raccogliere i vostri contatti e per farvi segnare la data sul calendario. Riceverete un invito personalizzato nei prossimi mesi, avete ancora tempo per pensarci!",
     altPhoto: "Alice e Max che ridono insieme, lei con un calice di spumante in mano",
@@ -93,7 +93,7 @@ window.STD_TRANSLATIONS = {
   fr: {
     kicker: "Save the date",
     place: "Lerici · Golfe des Poètes",
-    joyText: "Notre plus grande joie serait de vous avoir tous avec nous en ce jour si important. Nous avons hâte de faire la fête ensemble !",
+    joyText: "Nous serions ravis de vous avoir avec nous pour célébrer ce jour, nous avons hâte !",
     nbLabel: "NB :",
     nbText: "remplir ce formulaire ne confirme pas officiellement votre présence : il nous sert seulement à recueillir vos coordonnées et à vous faire noter la date dans votre agenda. Vous recevrez une invitation personnalisée dans les prochains mois, vous avez encore le temps d'y réfléchir !",
     altPhoto: "Alice et Max qui rient ensemble, elle tient une coupe de mousseux",
@@ -165,7 +165,7 @@ window.STD_TRANSLATIONS = {
   en: {
     kicker: "Save the date",
     place: "Lerici · Gulf of Poets",
-    joyText: "Our greatest joy would be to have you all with us on this important day. We can't wait to celebrate together!",
+    joyText: "We would be delighted to have you with us to celebrate this day, we can't wait!",
     nbLabel: "NB:",
     nbText: "filling in this form does not officially confirm your attendance: we only need it to collect your contact details and to let you mark the date in your calendar. You'll receive a personal invitation in the coming months, so there's still plenty of time to think about it!",
     altPhoto: "Alice and Max laughing together, she is holding a glass of sparkling wine",
