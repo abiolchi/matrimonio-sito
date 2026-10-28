@@ -39,7 +39,7 @@ Leggi anche README.md e apps-script/GUIDA.md.
     3. Grazie: simboli di Lerici in SVG e l'acquerello con la didascalia "non rispecchia la realtà".
 - Menu «Controlla i contatti» (`checkContacts` → `linkContacts_`, funzione pura provabile fuori da Google): collega Contatti ↔ Invitati 1 a 1 col codice.
   Verde solo se tutti i nomi dell'invito sono nel contatto, l'invito è il più preciso (più nomi, poi più parole) ed è unico in entrambe le direzioni; altrimenti giallo con nota 🔎 sul nome.
-  Non cancella/unisce righe, non cambia codici già scritti; in Invitati colonne F–I = formule INDEX/MATCH su Contatti.
+  A ogni giro prima toglie colori e note 🔎 da tutte le righe (anche vuote), poi ricolora. Non cancella/unisce righe, non cambia codici già scritti; in Invitati colonne F–I = formule INDEX/MATCH su Contatti.
 - Sicurezza: la lista non sta mai nel codice del sito; i codici sono casuali; blocco dopo 50 codici sbagliati in 10 minuti; campo trappola per i bot; testi protetti dall'interpretazione come formule.
 
 ## Regole

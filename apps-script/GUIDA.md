@@ -128,7 +128,7 @@ Alla fine ogni invito della scheda **Invitati** deve avere **un solo** contatto,
    - **collegamento che lo script non trova** → scrivete voi il codice in «Codice invito».
 5. Rilanciate **Controlla i contatti** finché è tutto verde.
 
-Lo script **non cancella e non unisce mai** righe, e **non cambia mai** un codice già scritto in Contatti: lo controlla soltanto (se non esiste, se è su due righe o se i nomi non c'entrano, la riga diventa gialla). Le vostre note sulla cella del nome restano: lo script usa solo le note che iniziano con 🔎. Attenzione: i colori di sfondo delle righe vengono rifatti a ogni controllo.
+Lo script **non cancella e non unisce mai** righe, e **non cambia mai** un codice già scritto in Contatti: lo controlla soltanto (se non esiste, se è su due righe o se i nomi non c'entrano, la riga diventa gialla). Le vostre note sulla cella del nome restano: lo script usa solo le note che iniziano con 🔎. A ogni controllo lo script prima **toglie tutti i colori e le note 🔎** del controllo precedente, anche dalle righe che avete cancellato, e poi ricolora: se svuotate Contatti (o Invitati) e rilanciate, il foglio torna pulito. Attenzione quindi: i colori di sfondo messi a mano sotto le intestazioni non restano. I codici già scritti in «Codice invito» invece restano: per ripartire davvero da zero durante le prove, cancellate anche quella colonna.
 
 ## Impostazioni nello script
 
