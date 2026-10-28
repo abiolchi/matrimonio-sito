@@ -84,15 +84,16 @@ Nella scheda **Invitati**, una riga per invito:
 
 ## Contatti della "save the date"
 
-Finché il sito mostra la pagina save the date, ogni invito (singolo, coppia o famiglia) lascia i nomi, un'email, un cellulare e, se vuole, un secondo cellulare. Lo script li scrive nella scheda **Contatti**, una riga per invito:
+Finché il sito mostra la pagina save the date, ogni invito (singolo, coppia o famiglia) lascia i nomi, un'email, un cellulare e, se vuole, una seconda email e un secondo cellulare (per l'altra persona della coppia). Lo script li scrive nella scheda **Contatti**, una riga per invito:
 
 | Colonna | Chi la scrive |
 |---|---|
-| Data, Nomi, Email, Cellulare (WhatsApp), Cellulare 2, Lingua | lo script |
+| Data, Nomi, Email, Email 2, Cellulare (WhatsApp), Cellulare 2, Lingua | lo script |
 | Codice invito, Note (private) | **voi**: lo script non le tocca mai |
 
 - I numeri sono già in formato internazionale, per esempio `+32470123456`.
-- Se qualcuno rimanda il modulo con **la stessa email**, la sua riga viene aggiornata (Codice invito e Note restano come li avete scritti).
+- Se la scheda Contatti era stata creata prima che esistesse «Email 2», lo script inserisce da solo la colonna dopo «Email» al primo invio (o con **Prepara il foglio**): i dati già presenti si spostano a destra insieme alle loro colonne.
+- Se qualcuno rimanda il modulo con **la stessa email principale**, la sua riga viene aggiornata (Codice invito e Note restano come li avete scritti).
 - Il sito ricorda i dati mandati **su quel dispositivo**: tornando sulla pagina, l'ospite vede cosa ha salvato e può correggerlo. Se corregge anche l'email, viene aggiornata la stessa riga invece di crearne una nuova. Da un altro telefono o computer il modulo riparte vuoto, e con un'email diversa arriva una riga nuova.
 - Ogni invio finisce anche nello **Storico** ("Nuovi contatti" o "Contatti aggiornati").
 - Nel **Riepilogo** c'è la riga "Contatti ricevuti (save the date)".
@@ -100,6 +101,34 @@ Finché il sito mostra la pagina save the date, ogni invito (singolo, coppia o f
 - Protezione: al massimo 150 invii ogni 10 minuti in tutto. Oltre, il sito chiede di riprovare più tardi.
 
 Se il foglio esisteva già prima della save the date, dopo aver incollato il nuovo codice lancia di nuovo **💍 Matrimonio → Prepara il foglio**: aggiunge la scheda Contatti e la riga nel Riepilogo senza toccare invitati e risposte.
+
+## Collegare i contatti agli inviti (prima di mandare gli RSVP)
+
+Alla fine ogni invito della scheda **Invitati** deve avere **un solo** contatto, e ogni contatto un solo invito. Il collegamento è il **codice dell'invito**, scritto nella colonna «Codice invito» di Contatti.
+
+1. **Chiudete la save the date** (tornate al sito completo, vedi README), così nessuno aggiunge o cambia contatti mentre sistemate.
+2. In **Invitati** scrivete la lista: una riga per invito, nomi separati da `;` (`Veronica; Matteo`). Se due inviti hanno lo stesso nome **e sono singoli**, aggiungete il cognome (`Matteo Neri`): così il controllo li distingue. Le coppie vanno bene anche senza cognome (`Veronica; Matteo` e `Jessica; Matteo` sono diversi).
+3. **💍 Matrimonio → Controlla i contatti.** Lo script:
+   - genera i codici mancanti in Invitati;
+   - per ogni contatto cerca l'invito i cui nomi ci sono **tutti** («Veronica e Matteo Rossi» → `Veronica; Matteo`). Se ne combaciano più di uno vince il più preciso (più nomi, poi con il cognome);
+   - colora le righe di **Contatti** e di **Invitati**:
+
+     | Colore | Significato |
+     |---|---|
+     | 🟢 verde | collegato: un contatto ↔ un invito. Il codice viene scritto da solo in «Codice invito». |
+     | 🟡 giallo | da guardare voi. Il motivo è nella **nota sulla cella del nome** (passateci sopra col mouse): doppione, coppia iscritta separatamente, più inviti possibili, codice sbagliato… |
+     | nessuno | nessun corrispondente: contatto senza invito, o invito senza contatto. |
+
+   - in **Invitati**, dalla colonna F, mostra **Email, Email 2, Cellulare, Cellulare 2** letti da Contatti tramite il codice (sono formule: se correggete Contatti, si aggiornano da sole). Le colonne F–I devono essere libere.
+   - alla fine mostra un riepilogo con i numeri.
+4. Sistemate i gialli a mano:
+   - **doppione** → cancellate la riga in più;
+   - **coppia iscritta separatamente** → spostate email e cellulare dell'altra persona in «Email 2» e «Cellulare 2» della prima riga e cancellate la seconda;
+   - **contatto mancante** → aggiungete la riga (i numeri come testo: `'+39…` con l'apostrofo davanti);
+   - **collegamento che lo script non trova** → scrivete voi il codice in «Codice invito».
+5. Rilanciate **Controlla i contatti** finché è tutto verde.
+
+Lo script **non cancella e non unisce mai** righe, e **non cambia mai** un codice già scritto in Contatti: lo controlla soltanto (se non esiste, se è su due righe o se i nomi non c'entrano, la riga diventa gialla). Le vostre note sulla cella del nome restano: lo script usa solo le note che iniziano con 🔎. Attenzione: i colori di sfondo delle righe vengono rifatti a ogni controllo.
 
 ## Impostazioni nello script
 

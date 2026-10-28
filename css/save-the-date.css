@@ -72,6 +72,14 @@
   background: #fff; color: var(--navy); font: inherit; font-size: 16px; cursor: pointer;
 }
 .cc:focus { outline: 2px solid var(--navy); outline-offset: 1px; }
+
+/* campi facoltativi raggruppati, separati da una linea */
+.optional { display: flex; flex-direction: column; gap: 20px; padding-top: 20px; border-top: 1px solid var(--line); }
+.optional legend {
+  float: left; width: 100%; margin: 0;
+  font-family: var(--sans); font-size: 13px; letter-spacing: .12em; text-transform: uppercase; font-weight: 500;
+  color: var(--navy-soft);
+}
 .field input[aria-invalid="true"] { border-color: var(--error); }
 
 .std-actions { display: flex; flex-wrap: wrap; gap: 12px; }

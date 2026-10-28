@@ -1,7 +1,8 @@
 /* =========================================================
    Logica della pagina "Save the date": cambio lingua + modulo contatti
 
-   1. l'ospite scrive nome, email e cellulare (più un secondo cellulare facoltativo)
+   1. l'ospite scrive nomi, email e cellulare (più una seconda email e un secondo
+      cellulare facoltativi, per l'altra persona della coppia)
    2. i numeri vengono controllati e salvati in formato internazionale (+32470123456)
    3. invio al Google Sheet (scheda "Contatti"), oppure finto invio in modalità di prova
    4. "Grazie" con il riepilogo di cosa è stato salvato; i dati restano anche in questo
@@ -164,7 +165,7 @@
      ========================================================= */
 
   var EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
-  var FIELDS = ["name", "email", "phone1", "phone2"];
+  var FIELDS = ["name", "email", "phone1", "email2", "phone2"];
 
   function setError(id, key) {
     var input = $(id), err = $(id + "-error");
@@ -187,6 +188,8 @@
       key = value ? null : "errName";
     } else if (id === "email") {
       key = !value ? "errEmailEmpty" : EMAIL_RE.test(value) ? null : "errEmail";
+    } else if (id === "email2") {
+      key = !value || EMAIL_RE.test(value) ? null : "errEmail"; // facoltativa
     } else {
       var n = id.slice(-1);
       var r = parsePhone(value, $("cc" + n).value);
@@ -277,7 +280,7 @@
     try { localStorage.setItem(STORE_KEY, JSON.stringify(s)); } catch (e) {}
   }
 
-  var saved = loadSaved(); // { name, email, phones: [{ cc, number, value }], savedAt }
+  var saved = loadSaved(); // { name, email, email2, phones: [{ cc, number, value }], savedAt }
   var view = "form";       // "form" | "thanks" (appena inviato) | "saved" (visita successiva)
 
   function show(next) {
@@ -297,6 +300,7 @@
     if (!saved) return;
     $("name").value = saved.name;
     $("email").value = saved.email;
+    $("email2").value = saved.email2 || "";
     saved.phones.forEach(function (p, i) {
       var n = PHONES[i];
       if (!n) return;
@@ -334,7 +338,9 @@
     });
     var name = $("name").value.trim();
     var email = $("email").value.trim();
-    var payload = { action: "contact", name: name, email: email, phones: phones, lang: current, website: $("website").value };
+    var email2 = $("email2").value.trim();
+    if (email2.toLowerCase() === email.toLowerCase()) email2 = ""; // la stessa email due volte: basta una
+    var payload = { action: "contact", name: name, email: email, email2: email2, phones: phones, lang: current, website: $("website").value };
     // se da questo dispositivo era già stata mandata un'altra email, il foglio aggiorna quella riga
     if (saved && saved.email.toLowerCase() !== email.toLowerCase()) payload.previousEmail = saved.email;
 
@@ -345,7 +351,7 @@
     api.save(payload)
       .then(function (res) {
         if (res && res.ok) {
-          saved = { name: name, email: email, phones: entered, savedAt: new Date().toISOString() };
+          saved = { name: name, email: email, email2: email2, phones: entered, savedAt: new Date().toISOString() };
           storeSaved(saved);
           show("thanks");
           $("thanks-title").focus();
@@ -371,25 +377,31 @@
     return c ? "+" + c.dial + " " + v.slice(c.dial.length + 1) : v;
   }
 
+  function savedEmails() { return saved.email2 ? [saved.email, saved.email2] : [saved.email]; }
+
+  // righe una sotto l'altra (email, cellulari) nel riepilogo
+  function fillLines(box, lines) {
+    box.textContent = "";
+    lines.forEach(function (text) {
+      var line = document.createElement("span");
+      line.textContent = text;
+      box.appendChild(line);
+    });
+  }
+
   function render() {
     if (view === "form" || !saved) return;
     // textContent: nomi, email e numeri non vengono mai interpretati come HTML
     if (view === "thanks") {
       $("thanks-title").textContent = fill(t("thanksTitle"), { name: saved.name });
-      $("thanks-body").textContent = fill(t("thanksBody"), { email: saved.email });
+      $("thanks-body").textContent = fill(t("thanksBody"), { email: savedEmails().join(" " + t("and") + " ") });
     } else {
       $("thanks-title").textContent = t("savedTitle");
       $("thanks-body").textContent = fill(t("savedBody"), { date: formatDate(saved.savedAt) });
     }
     $("sum-names").textContent = saved.name;
-    $("sum-email").textContent = saved.email;
-    var box = $("sum-phones");
-    box.textContent = "";
-    saved.phones.forEach(function (p) {
-      var line = document.createElement("span");
-      line.textContent = prettyPhone(p.value);
-      box.appendChild(line);
-    });
+    fillLines($("sum-email"), savedEmails());
+    fillLines($("sum-phones"), saved.phones.map(function (p) { return prettyPhone(p.value); }));
   }
 
   /* =========================================================

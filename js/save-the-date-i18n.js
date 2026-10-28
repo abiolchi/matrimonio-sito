@@ -6,7 +6,8 @@
    - data-i18n-alt → testo alternativo di un'immagine,
      data-i18n-aria → aria-label (es. il menu del prefisso).
    - Una chiave nuova va aggiunta in TUTTE e tre le lingue.
-   - {name}, {email} e {date} vengono sostituiti automaticamente.
+   - {name}, {email} e {date} vengono sostituiti automaticamente
+     ({email} può essere "a@x.it e b@y.it": le due email unite con la parola "and").
    - Il modulo si compila una volta per invito (singolo, coppia o famiglia).
    ========================================================= */
 
@@ -43,8 +44,11 @@ window.STD_TRANSLATIONS = {
     phoneLabel: "Cellulare (WhatsApp)",
     phoneHelp: "Lo useremo solo per mandarvi messaggi dell'ultimo minuto su WhatsApp il giorno del matrimonio.",
     ccLabel: "Prefisso del paese",
-    phone2Label: "Secondo cellulare (facoltativo)",
-    phone2Help: "Per esempio, quello dell'altra persona, se siete in coppia.",
+    optLegend: "Se siete in coppia (facoltativo)",
+    email2Label: "Seconda email",
+    email2Help: "Se volete ricevere entrambi le nostre email.",
+    phone2Label: "Secondo cellulare (WhatsApp)",
+    phone2Help: "Se volete ricevere entrambi i messaggi del giorno del matrimonio.",
     privacy: "Useremo questi dati solo per organizzare il matrimonio.",
     send: "Invia",
     sending: "Invio in corso…",
@@ -72,6 +76,7 @@ window.STD_TRANSLATIONS = {
     sumNames: "Nomi",
     sumEmail: "Email",
     sumPhones: "Cellulari",
+    and: "e",
     editHint: "Qualcosa non va? Potete correggere i dati quando volete.",
     editBtn: "Modifica i contatti",
 
@@ -110,8 +115,11 @@ window.STD_TRANSLATIONS = {
     phoneLabel: "Portable (WhatsApp)",
     phoneHelp: "Nous l'utiliserons uniquement pour vous envoyer des messages de dernière minute sur WhatsApp le jour du mariage.",
     ccLabel: "Indicatif du pays",
-    phone2Label: "Deuxième portable (facultatif)",
-    phone2Help: "Par exemple, celui de l'autre personne, si vous êtes en couple.",
+    optLegend: "Si vous êtes en couple (facultatif)",
+    email2Label: "Deuxième e-mail",
+    email2Help: "Si vous souhaitez recevoir tous les deux nos e-mails.",
+    phone2Label: "Deuxième portable (WhatsApp)",
+    phone2Help: "Si vous souhaitez recevoir tous les deux les messages du jour du mariage.",
     privacy: "Nous utiliserons ces données uniquement pour organiser le mariage.",
     send: "Envoyer",
     sending: "Envoi en cours…",
@@ -137,6 +145,7 @@ window.STD_TRANSLATIONS = {
     sumNames: "Noms",
     sumEmail: "E-mail",
     sumPhones: "Portables",
+    and: "et",
     editHint: "Quelque chose ne va pas ? Vous pouvez corriger vos données quand vous le souhaitez.",
     editBtn: "Modifier les coordonnées",
 
@@ -174,8 +183,11 @@ window.STD_TRANSLATIONS = {
     phoneLabel: "Mobile (WhatsApp)",
     phoneHelp: "We'll only use it to send you last-minute WhatsApp messages on the wedding day.",
     ccLabel: "Country code",
-    phone2Label: "Second mobile (optional)",
-    phone2Help: "For example, your partner's, if you're a couple.",
+    optLegend: "If you're a couple (optional)",
+    email2Label: "Second email",
+    email2Help: "If you'd both like to receive our emails.",
+    phone2Label: "Second mobile (WhatsApp)",
+    phone2Help: "If you'd both like to receive the messages on the wedding day.",
     privacy: "We'll only use these details to organise the wedding.",
     send: "Send",
     sending: "Sending…",
@@ -201,6 +213,7 @@ window.STD_TRANSLATIONS = {
     sumNames: "Names",
     sumEmail: "Email",
     sumPhones: "Mobiles",
+    and: "and",
     editHint: "Something not right? You can correct your details whenever you like.",
     editBtn: "Edit details",
 
