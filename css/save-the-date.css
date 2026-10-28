@@ -1,0 +1,114 @@
+/* =========================================================
+   Save the date — si carica DOPO css/style.css e ne riusa
+   colori, font, pulsanti e campi. Qui solo quello che è nuovo.
+   ========================================================= */
+
+/* ---------- Hero ---------- */
+.std-hero .hero-inner { padding-bottom: 72px; gap: 16px; }
+.std-kicker { margin-top: 8px; }
+.std-date {
+  font-family: var(--serif); font-weight: 500;
+  font-size: clamp(36px, 6vw, 56px); line-height: 1.1; letter-spacing: .06em;
+}
+
+/* ---------- Foto + modulo ---------- */
+.std {
+  display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 64px; align-items: start;
+  max-width: 1080px; padding-top: 16px; padding-bottom: 88px;
+}
+
+/* colonna di sinistra: programma, poi la foto */
+.std-side { display: flex; flex-direction: column; gap: 48px; min-width: 0; }
+.std-events { display: flex; flex-direction: column; gap: 16px; }
+.std-events h2 { font-style: italic; font-size: 44px; line-height: 1.15; margin-bottom: 4px; }
+.std-event {
+  display: grid; grid-template-columns: 120px minmax(0, 1fr); gap: 20px; align-items: start;
+  background: #fff; border: 1px solid var(--line); border-radius: 8px; padding: 16px;
+}
+.std-event img { width: 120px; aspect-ratio: 1; object-fit: cover; border-radius: 4px; }
+.std-event h3 { font-style: italic; font-size: 28px; line-height: 1.15; margin: 2px 0 4px; }
+.std-event .facts { font-size: 15px; }
+
+/* eventi collaterali del sabato: uno di fianco all'altro, sotto la festa */
+.std-before { margin-top: 12px; padding-top: 20px; border-top: 1px solid var(--line); display: flex; flex-direction: column; gap: 6px; }
+.std-before-note { margin: 0 0 10px; font-style: italic; color: var(--navy-soft); line-height: 1.5; }
+.std-before-events { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.std-mini {
+  display: flex; flex-direction: column; gap: 4px;
+  background: #fff; border: 1px solid var(--line); border-radius: 8px; padding: 14px;
+}
+.std-mini h3 { font-style: italic; font-size: 24px; line-height: 1.15; }
+.std-mini .facts { font-size: 15px; margin: 0; }
+.std-mini .map-link { padding-bottom: 0; }
+
+/* foto in bianco e nero con una cornice gialla spostata */
+.std-photo { position: relative; margin: 0 20px 20px 0; }
+.std-photo::before {
+  content: ""; position: absolute; inset: 0;
+  transform: translate(20px, 20px);
+  border: 2px solid var(--lemon); border-radius: 4px;
+}
+.std-photo img { position: relative; width: 100%; border-radius: 4px; }
+
+.std-card {
+  background: #fff; border: 1px solid var(--line); border-radius: 8px;
+  padding: 40px 40px 44px;
+}
+.std-card h2 { font-style: italic; font-size: 44px; line-height: 1.15; }
+.std-intro { margin: 10px 0 28px; }
+
+.help { margin: 0; font-size: 14px; line-height: 1.5; color: var(--navy-soft); }
+/* descrizione di un campo: in corsivo, tra l'etichetta e la casella */
+.field .help { font-style: italic; margin: -2px 0 2px; }
+.privacy { font-style: italic; }
+
+/* prefisso + numero sulla stessa riga */
+.phone { display: flex; gap: 8px; }
+.phone input { flex: 1 1 auto; min-width: 0; }
+.cc {
+  flex: 0 0 auto; min-height: 48px; padding: 0 10px;
+  border: 1px solid var(--field); border-radius: 4px;
+  background: #fff; color: var(--navy); font: inherit; font-size: 16px; cursor: pointer;
+}
+.cc:focus { outline: 2px solid var(--navy); outline-offset: 1px; }
+.field input[aria-invalid="true"] { border-color: var(--error); }
+
+.std-actions { display: flex; flex-wrap: wrap; gap: 12px; }
+.std-actions .btn { flex: 1 1 160px; }
+#send-error { text-align: center; }
+.demo-note { margin-bottom: 0; }
+
+/* ---------- Grazie / contatti già salvati ---------- */
+.std-thanks { text-align: center; display: flex; flex-direction: column; align-items: center; gap: 16px; padding: 24px 0 0; }
+.std-thanks h2:focus { outline: none; }
+.std-thanks p { margin: 0; max-width: 420px; overflow-wrap: anywhere; }
+
+.summary {
+  align-self: stretch; text-align: left;
+  background: var(--cream); border: 1px solid var(--line); border-radius: 6px; padding: 16px 18px;
+}
+.summary > p { font-weight: 500; margin-bottom: 10px; }
+.summary dl { margin: 0; display: grid; gap: 10px; }
+.summary dt { font-size: 13px; letter-spacing: .12em; text-transform: uppercase; font-weight: 500; color: var(--navy-soft); }
+.summary dd { margin: 0; overflow-wrap: anywhere; }
+.summary dd span { display: block; }
+
+/* ---------- Tablet e telefono: foto sopra il modulo ---------- */
+@media (max-width: 860px) {
+  .std { grid-template-columns: minmax(0, 1fr); gap: 40px; max-width: 620px; }
+}
+@media (max-width: 560px) {
+  .std { padding-left: 16px; padding-right: 16px; padding-bottom: 56px; }
+  .std-photo { margin: 0 14px 14px 0; }
+  .std-photo::before { transform: translate(14px, 14px); }
+  .std-card { padding: 28px 18px 32px; }
+  .std-card h2, .std-events h2 { font-size: 36px; }
+  .std-event { grid-template-columns: 88px minmax(0, 1fr); gap: 14px; padding: 14px; }
+  .std-event img { width: 88px; }
+  .std-event h3 { font-size: 24px; }
+  .std-before-events { gap: 10px; }
+  .std-mini { padding: 10px; }
+  .std-mini h3 { font-size: 21px; }
+  .std-mini .facts div { flex-direction: column; }
+}

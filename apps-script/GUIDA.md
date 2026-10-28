@@ -23,14 +23,15 @@ Ci vogliono circa 10 minuti, da fare una volta sola. Serve un account Google, e 
    - **Consenti**.
 4. Rilancia **Prepara il foglio** se la prima volta si è fermato all'autorizzazione.
 
-Ora il foglio ha quattro schede:
+Ora il foglio ha cinque schede:
 
 | Scheda | A cosa serve |
 |---|---|
+| **Contatti** | Sempre la prima. Si riempie da sola con i contatti lasciati sulla pagina "save the date" (vedi sotto). |
 | **Invitati** | Una riga per invito (coppia, famiglia, singolo). Qui scrivete voi la lista. |
 | **Risposte** | Si riempie da sola: una riga per persona. Se un invito modifica la risposta, le sue righe vengono sostituite. |
 | **Storico** | Tutte le risposte e modifiche, in ordine, così niente va perso. |
-| **Riepilogo** | Numeri aggiornati: quanti sì e quanti no per domenica e per lunedì. |
+| **Riepilogo** | Numeri aggiornati: quanti sì e quanti no per domenica e per il civile di sabato. |
 
 ## 4. Pubblica lo script come "App web"
 
@@ -74,12 +75,31 @@ Nella scheda **Invitati**, una riga per invito:
 | Codice | Lasciala vuota: poi usate **💍 Matrimonio → Genera i codici mancanti** |
 | Nomi | I nomi separati da `;`, ad esempio `Giulia; Marco`. Come li scrivete qui, così li vedranno gli ospiti. |
 | Lingua | `it`, `fr` o `en`: la lingua in cui il modulo si apre per quell'invito |
-| Invitati al civile | `sì` se l'invito comprende anche il matrimonio civile di lunedì, altrimenti `no`. Con `no` la Parte 2 non compare. |
+| Invitati al civile | `sì` se l'invito comprende anche il matrimonio civile di sabato, altrimenti `no`. Con `no` la Parte 2 non compare. |
 | Note | Solo per voi: non viene mai mostrata agli ospiti |
 
 **Attenzione:** se cambiate i nomi di un invito che ha già risposto, chiedete all'invito di rispondere di nuovo, perché le risposte sono legate ai nomi.
 
 **Link personali:** potete mandare a ogni invito il link `https://vostro-dominio/?code=LIMONE-4K7#rsvp`, che apre il modulo già compilato col codice. Si può anche trasformare in QR code da stampare sulla partecipazione.
+
+## Contatti della "save the date"
+
+Finché il sito mostra la pagina save the date, ogni invito (singolo, coppia o famiglia) lascia i nomi, un'email, un cellulare e, se vuole, un secondo cellulare. Lo script li scrive nella scheda **Contatti**, una riga per invito:
+
+| Colonna | Chi la scrive |
+|---|---|
+| Data, Nomi, Email, Cellulare (WhatsApp), Cellulare 2, Lingua | lo script |
+| Codice invito, Note (private) | **voi**: lo script non le tocca mai |
+
+- I numeri sono già in formato internazionale, per esempio `+32470123456`.
+- Se qualcuno rimanda il modulo con **la stessa email**, la sua riga viene aggiornata (Codice invito e Note restano come li avete scritti).
+- Il sito ricorda i dati mandati **su quel dispositivo**: tornando sulla pagina, l'ospite vede cosa ha salvato e può correggerlo. Se corregge anche l'email, viene aggiornata la stessa riga invece di crearne una nuova. Da un altro telefono o computer il modulo riparte vuoto, e con un'email diversa arriva una riga nuova.
+- Ogni invio finisce anche nello **Storico** ("Nuovi contatti" o "Contatti aggiornati").
+- Nel **Riepilogo** c'è la riga "Contatti ricevuti (save the date)".
+- Se la scheda Contatti manca, lo script la ricrea da solo al primo invio.
+- Protezione: al massimo 150 invii ogni 10 minuti in tutto. Oltre, il sito chiede di riprovare più tardi.
+
+Se il foglio esisteva già prima della save the date, dopo aver incollato il nuovo codice lancia di nuovo **💍 Matrimonio → Prepara il foglio**: aggiunge la scheda Contatti e la riga nel Riepilogo senza toccare invitati e risposte.
 
 ## Impostazioni nello script
 

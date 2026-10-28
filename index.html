@@ -3,35 +3,37 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Alice &amp; Max · 19.09.2027 · Lerici</title>
-  <meta name="description" content="Alice & Max · 19 settembre 2027 · Lerici">
+  <title>Alice &amp; Max · Save the date · 19.09.2027 · Lerici</title>
+  <meta name="description" content="Alice & Max · Save the date · 19 settembre 2027 · Lerici">
   <meta name="theme-color" content="#FBF7EE">
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Jost:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/save-the-date.css">
 </head>
 <body>
 
+<!-- =========================================================
+     SAVE THE DATE — pagina provvisoria.
+     Il sito completo (programma, viaggio, RSVP) è in sito-completo.html:
+     per rimetterlo online vedi README.md, "Tornare al sito completo".
+     ========================================================= -->
+
 <header class="wrap top">
-  <a class="mono" href="#top" aria-label="Alice &amp; Max">A &amp; M</a>
-  <nav aria-label="Menu">
-    <a href="#day" data-i18n="navDay">Programma</a>
-    <a href="#travel" data-i18n="navTravel">Viaggio e alloggio</a>
-    <a href="#rsvp" data-i18n="navRsvp">RSVP</a>
-    <div class="langs" role="group" aria-label="Lingua / Langue / Language">
-      <button type="button" data-lang="it" aria-pressed="true">IT</button>
-      <button type="button" data-lang="fr" aria-pressed="false">FR</button>
-      <button type="button" data-lang="en" aria-pressed="false">EN</button>
-    </div>
-  </nav>
+  <span class="mono" aria-label="Alice &amp; Max">A &amp; M</span>
+  <div class="langs" role="group" aria-label="Lingua / Langue / Language">
+    <button type="button" data-lang="it" aria-pressed="true">IT</button>
+    <button type="button" data-lang="fr" aria-pressed="false">FR</button>
+    <button type="button" data-lang="en" aria-pressed="false">EN</button>
+  </div>
 </header>
 
-<main id="top">
+<main>
 
   <!-- ======================= HERO (acquerello: css/style.css, sezione Hero) ======================= -->
-  <section class="hero">
+  <section class="hero std-hero">
     <div class="wrap hero-inner">
       <svg width="220" height="120" viewBox="0 0 220 120" aria-hidden="true">
         <path d="M50 80 A60 60 0 0 1 170 80" fill="#E8B931"/>
@@ -39,204 +41,133 @@
         <path d="M0 100 Q27 90 54 100 T108 100 T162 100 T216 100" fill="none" stroke="#1F3A5F" stroke-width="2"/>
         <path d="M20 112 Q47 102 74 112 T128 112 T182 112 T236 112" fill="none" stroke="#1F3A5F" stroke-width="2" opacity="0.5"/>
       </svg>
-      <div class="kicker" data-i18n="kicker">Ci sposiamo</div>
       <h1 class="names">Alice &amp; Max</h1>
-      <div class="date" data-i18n="date">Domenica 19 settembre 2027</div>
+      <div class="kicker std-kicker" data-i18n="kicker">Save the date</div>
+      <div class="std-date">19 · 09 · 2027</div>
       <div class="place" data-i18n="place">Lerici · Golfo dei Poeti</div>
-      <p class="intro" data-i18n="intro">Saremmo felici di festeggiare con voi in riva al mare, in Liguria. Qui troverete tutte le informazioni, che aggiorneremo man mano.</p>
-      <a class="btn" href="#rsvp" data-i18n="cta">Conferma la presenza</a>
     </div>
   </section>
 
-  <!-- ======================= PROGRAMMA ======================= -->
-  <section id="day" class="day">
-    <div class="wrap">
-      <h2 data-i18n="dayTitle">Programma</h2>
-      <div class="cards">
-        <article class="card">
-          <img src="assets/img/villa-marigola.jpg" width="800" height="793" loading="lazy" alt="" data-i18n-alt="altVilla">
-          <div class="card-body">
+  <!-- ======================= PROGRAMMA + FOTO | CONTATTI ======================= -->
+  <section class="wrap std" aria-labelledby="std-title">
+    <div class="std-side">
+      <!-- programma, per organizzare il viaggio: prima la festa, poi gli eventi del giorno prima -->
+      <div class="std-events">
+        <h2 data-i18n="eventsTitle">Programma</h2>
+        <article class="std-event">
+          <img src="assets/img/villa-marigola-giardino.jpg" width="800" height="793" alt="" data-i18n-alt="altVilla">
+          <div>
             <div class="card-day" data-i18n="ev1Day">Domenica 19 settembre 2027</div>
-            <h3 class="title" data-i18n="ev1Title">Cerimonia simbolica e ricevimento</h3>
+            <h3 data-i18n="ev1Title">Cerimonia simbolica e ricevimento</h3>
             <dl class="facts">
-              <div><dt data-i18n="labelTime">Orario</dt><dd>16:00 – 02:00</dd></div>
+              <div><dt data-i18n="labelWhen">Quando</dt><dd data-i18n="ev1When">Dal pomeriggio fino a tarda notte</dd></div>
               <div><dt data-i18n="labelPlace">Luogo</dt><dd>Villa Marigola, Lerici</dd></div>
             </dl>
             <a class="map-link" href="https://maps.app.goo.gl/RPm8QRS6ktQr2fqP8" target="_blank" rel="noopener" data-i18n="mapLink">Apri su Google Maps</a>
           </div>
         </article>
-        <article class="card">
-          <img src="assets/img/castello-lerici.jpg" width="800" height="796" loading="lazy" alt="" data-i18n-alt="altCastle">
-          <div class="card-body">
-            <div class="card-day" data-i18n="ev2Day">Lunedì 20 settembre 2027</div>
-            <h3 class="title" data-i18n="ev2Title">Matrimonio civile</h3>
-            <dl class="facts">
-              <div><dt data-i18n="labelTime">Orario</dt><dd>12:30</dd></div>
-              <div><dt data-i18n="labelPlace">Luogo</dt><dd>Castello di Lerici / Municipio di Lerici</dd></div>
-            </dl>
-            <a class="map-link" href="https://www.google.com/maps/search/?api=1&amp;query=Castello+di+Lerici" target="_blank" rel="noopener" data-i18n="mapLink">Apri su Google Maps</a>
-          </div>
-        </article>
-      </div>
-    </div>
-  </section>
 
-  <!-- ======================= VIAGGIO ======================= -->
-  <section id="travel" class="wrap travel">
-    <h2 data-i18n="travelTitle">Viaggio e alloggio</h2>
-    <p data-i18n="travelBody">Stiamo preparando consigli su come arrivare a Lerici e dove dormire. Torna presto a trovarci.</p>
-    <div class="rule" aria-hidden="true"></div>
-  </section>
-
-  <!-- ======================= RSVP ======================= -->
-  <section id="rsvp" class="rsvp">
-    <div class="panel" id="rsvp-panel">
-
-      <!-- Passo 1: codice dell'invito -->
-      <div id="step-code">
-        <img class="panel-cover" src="assets/img/lerici-porto.jpg" width="1200" height="670" loading="lazy" alt="" data-i18n-alt="altPort">
-        <div class="panel-inner">
-          <div class="panel-head">
-            <h2>RSVP</h2>
-            <p data-i18n="rsvpSub">Ti chiediamo di rispondere entro il [DATA].</p>
-          </div>
-          <form id="code-form" class="stack" novalidate>
-            <div class="field">
-              <label for="code" data-i18n="codeIntro">Inserisci il codice che trovi sul tuo invito.</label>
-              <input id="code" name="code" type="text" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="LIMONE-4K7" aria-describedby="code-error">
-              <div id="code-error" class="error" role="alert" hidden></div>
-            </div>
-            <button class="btn btn-wide" type="submit" id="code-btn" data-i18n="codeBtn">Continua</button>
-            <p id="code-wait" class="wait" role="status" data-i18n="slowWait" hidden>Un attimo, ci vuole qualche secondo…</p>
-          </form>
-          <div id="demo-note" class="demo-note" hidden>
-            <span data-i18n="demoNote">Modalità di prova</span>
-            <span id="demo-codes" class="demo-codes"></span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Passo 2: modulo personalizzato -->
-      <form id="rsvp-form" class="panel-inner" novalidate hidden>
-        <div class="hello">
-          <h2 id="hello" tabindex="-1"></h2>
-          <p id="hello-sub"></p>
-          <p id="already" class="note" hidden></p>
-          <button type="button" id="not-me" class="link-btn" data-i18n="notMe">Non sei tu? Inserisci un altro codice</button>
-        </div>
-
-        <!-- trappola per i bot: invisibile alle persone -->
-        <div class="hp" aria-hidden="true">
-          <label for="website">Website</label>
-          <input id="website" name="website" type="text" tabindex="-1" autocomplete="off">
-        </div>
-
-        <!-- Parte 1: domenica -->
-        <section id="part1" class="part" aria-labelledby="q1">
-          <div class="event">
-            <img src="assets/img/villa-marigola.jpg" width="800" height="793" alt="" data-i18n-alt="altVilla">
-            <div>
-              <div class="part-label" data-i18n="part1">Parte 1</div>
-              <h3 data-i18n="ev1Title">Cerimonia simbolica e ricevimento</h3>
-              <dl class="facts">
-                <div><dt data-i18n="labelDate">Data</dt><dd data-i18n="ev1Day">Domenica 19 settembre 2027</dd></div>
-                <div><dt data-i18n="labelTime">Orario</dt><dd>16:00 – 02:00</dd></div>
-                <div><dt data-i18n="labelPlace">Luogo</dt><dd>Villa Marigola, Lerici</dd></div>
-              </dl>
-              <a class="map-link" href="https://maps.app.goo.gl/RPm8QRS6ktQr2fqP8" target="_blank" rel="noopener" data-i18n="mapLink">Apri su Google Maps</a>
-            </div>
-          </div>
-          <fieldset>
-            <legend id="q1"></legend>
-            <div id="rows-sun" class="people"></div>
-            <!-- +1: solo per gli inviti con una persona; segnarlo qui vuol dire che viene domenica -->
-            <div id="plus-box-sun" class="plus" hidden>
-              <label class="check">
-                <input type="checkbox" id="plus-on-sun">
-                <span data-i18n="plusLabel">Porto un accompagnatore (+1)</span>
-              </label>
-              <div id="plus-fields-sun" class="field" hidden>
-                <label for="plus-name-sun" data-i18n="plusNameLabel">Nome e cognome dell'accompagnatore</label>
-                <input id="plus-name-sun" type="text" maxlength="100" autocomplete="off" aria-describedby="err-plus-sun">
-                <div id="err-plus-sun" class="error" role="alert" data-i18n="errPlusName" hidden>Scrivi il nome dell'accompagnatore.</div>
-              </div>
-            </div>
-          </fieldset>
-          <div id="err-sun" class="error" role="alert" data-i18n="errAnswerAll" hidden>Rispondi per ogni persona.</div>
-          <div class="actions">
-            <button type="button" id="next-btn" class="btn btn-wide" data-i18n="next">Avanti</button>
-            <button type="submit" id="send-btn-1" class="btn btn-wide" data-i18n="send" hidden>Invia</button>
-          </div>
-        </section>
-
-        <!-- Parte 2: lunedì (solo per chi è invitato al civile) -->
-        <section id="part2" class="part" aria-labelledby="q2" hidden>
-          <div class="event">
-            <img src="assets/img/castello-lerici.jpg" width="800" height="796" alt="" data-i18n-alt="altCastle">
-            <div>
-              <div class="part-label" data-i18n="part2">Parte 2</div>
+        <!-- eventi collaterali, per chi è già in zona il giorno prima -->
+        <div class="std-before">
+          <div class="card-day" data-i18n="beforeDay">Sabato 18 settembre 2027 · Il giorno prima</div>
+          <p class="std-before-note" data-i18n="beforeNote">Per chi è già in zona: due momenti in più, prima della festa di domenica.</p>
+          <div class="std-before-events">
+            <article class="std-mini">
               <h3 data-i18n="ev2Title">Matrimonio civile</h3>
               <dl class="facts">
-                <div><dt data-i18n="labelDate">Data</dt><dd data-i18n="ev2Day">Lunedì 20 settembre 2027</dd></div>
-                <div><dt data-i18n="labelTime">Orario</dt><dd>12:30</dd></div>
-                <div><dt data-i18n="labelPlace">Luogo</dt><dd>Castello di Lerici / Municipio di Lerici</dd></div>
+                <div><dt data-i18n="labelWhen">Quando</dt><dd data-i18n="ev2When">Mattina</dd></div>
+                <div><dt data-i18n="labelPlace">Luogo</dt><dd>Lerici / Tellaro</dd></div>
               </dl>
-              <a class="map-link" href="https://www.google.com/maps/search/?api=1&amp;query=Castello+di+Lerici" target="_blank" rel="noopener" data-i18n="mapLink">Apri su Google Maps</a>
-            </div>
+            </article>
+            <article class="std-mini">
+              <h3 data-i18n="ev3Title">Aperitivo di benvenuto</h3>
+              <dl class="facts">
+                <div><dt data-i18n="labelWhen">Quando</dt><dd data-i18n="ev3When">Sera</dd></div>
+              </dl>
+            </article>
           </div>
-          <fieldset>
-            <legend id="q2"></legend>
-            <div id="rows-mon" class="people"></div>
-            <!-- +1 solo per il civile: compare se non è stato segnato nella Parte 1 -->
-            <div id="plus-box-mon" class="plus" hidden>
-              <label class="check">
-                <input type="checkbox" id="plus-on-mon">
-                <span data-i18n="plusLabel">Porto un accompagnatore (+1)</span>
-              </label>
-              <div id="plus-fields-mon" class="field" hidden>
-                <label for="plus-name-mon" data-i18n="plusNameLabel">Nome e cognome dell'accompagnatore</label>
-                <input id="plus-name-mon" type="text" maxlength="100" autocomplete="off" aria-describedby="err-plus-mon">
-                <div id="err-plus-mon" class="error" role="alert" data-i18n="errPlusName" hidden>Scrivi il nome dell'accompagnatore.</div>
-              </div>
-            </div>
-          </fieldset>
-          <div id="err-mon" class="error" role="alert" data-i18n="errAnswerAll" hidden>Rispondi per ogni persona.</div>
-          <div class="actions">
-            <button type="button" id="back-btn" class="btn btn-ghost" data-i18n="back">Indietro</button>
-            <button type="submit" id="send-btn-2" class="btn btn-wide" data-i18n="send">Invia</button>
-          </div>
-        </section>
-
-        <p id="send-wait" class="wait" role="status" data-i18n="slowWait" hidden>Un attimo, ci vuole qualche secondo…</p>
-        <div id="send-error" class="error" role="alert" hidden></div>
-      </form>
-
-      <!-- Passo 3: grazie -->
-      <div id="thanks" class="panel-inner thanks" hidden>
-        <div class="symbols" aria-hidden="true">
-          <!-- case colorate -->
-          <svg viewBox="0 0 64 64"><g stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M8 56V30l8-6 8 6v26z" fill="#F2C9A0"/><path d="M24 56V22l9-7 9 7v34z" fill="#E8B931"/><path d="M42 56V32l7-5 7 5v24z" fill="#E59A7E"/><path d="M4 56h56" fill="none"/></g><g fill="currentColor"><rect x="14" y="36" width="4" height="6"/><rect x="31" y="27" width="4" height="6"/><rect x="31" y="40" width="4" height="6"/><rect x="47" y="38" width="4" height="6"/></g></svg>
-          <!-- barca a vela -->
-          <svg viewBox="0 0 64 64"><g stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M33 8v36" fill="none"/><path d="M33 10l15 30H33z" fill="#FBF7EE"/><path d="M31 15L19 40h12z" fill="#E8B931"/><path d="M12 45h40l-6 7H18z" fill="currentColor"/><path d="M4 59c5-3 9-3 14 0s9 3 14 0 9-3 14 0 9 3 14 0" fill="none"/></g></svg>
-          <!-- castello di San Giorgio -->
-          <svg viewBox="0 0 64 64" class="big"><g stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M5 57c4-6 10-9 16-8 4-5 14-6 20-2 6-2 14 2 18 10z" fill="#D9CBA6"/><path d="M20 49V24h24v25" fill="#F3EBD7"/><path d="M18 24V18h4v3h4v-3h4v3h4v-3h4v3h4v-3h4v6z" fill="#F3EBD7"/><path d="M29 49v-7a3 3 0 0 1 6 0v7z" fill="currentColor"/><path d="M32 18V7" fill="none"/><path d="M32 7l8 2.5-8 2.5z" fill="#E8B931"/></g><g fill="currentColor"><rect x="24.5" y="29" width="3" height="5"/><rect x="36.5" y="29" width="3" height="5"/></g></svg>
-          <!-- limone -->
-          <svg viewBox="0 0 64 64"><g stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><ellipse cx="30" cy="38" rx="19" ry="13.5" transform="rotate(-30 30 38)" fill="#E8B931"/><path d="M46.5 28.5l3-3M13.5 47.5l-3 3" fill="none"/><path d="M49.5 25.5c1-8 7-12 12-12 0 7-5 12-12 12z" fill="#8FA876"/><path d="M49.5 25.5l7-7" fill="none"/></g></svg>
-          <!-- sole sul mare -->
-          <svg viewBox="0 0 64 64"><g stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"><path d="M18 40a14 14 0 0 1 28 0z" fill="#E8B931"/><path d="M32 20v-7M20 27l-5-5M44 27l5-5M13 38H6M51 38h7" fill="none"/><path d="M4 47c5-3 9-3 14 0s9 3 14 0 9-3 14 0 9 3 14 0" fill="none"/><path d="M4 55c5-3 9-3 14 0s9 3 14 0 9-3 14 0 9 3 14 0" fill="none" opacity=".55"/></g></svg>
-        </div>
-        <h2 id="thanks-title" tabindex="-1"></h2>
-        <p id="thanks-body"></p>
-        <figure>
-          <img src="assets/img/matrimonio-villa.jpg" width="900" height="900" loading="lazy" alt="" data-i18n-alt="altWedding">
-          <figcaption data-i18n="imgCaption">Questa immagine non rispecchia affatto la realtà</figcaption>
-        </figure>
-        <div class="actions thanks-actions">
-          <button type="button" id="edit-btn" class="btn btn-ghost" data-i18n="editAnswers">Modifica le risposte</button>
-          <a class="btn" href="#top" data-i18n="backHome">Torna alla home</a>
         </div>
       </div>
 
+      <figure class="std-photo">
+        <img src="assets/img/alice-max.jpg" width="900" height="724" loading="lazy" alt="" data-i18n-alt="altPhoto">
+      </figure>
+    </div>
+
+    <div class="std-card">
+      <div id="std-form-box">
+        <h2 id="std-title" data-i18n="formTitle">I vostri contatti</h2>
+        <p class="std-intro" data-i18n="intro">L'invito vero e proprio arriverà più avanti. Intanto lasciateci i vostri contatti, così sappiamo dove mandarvelo.</p>
+
+        <form id="contact-form" class="stack" novalidate>
+          <!-- trappola per i bot: invisibile alle persone -->
+          <div class="hp" aria-hidden="true">
+            <label for="website">Website</label>
+            <input id="website" name="website" type="text" tabindex="-1" autocomplete="off">
+          </div>
+
+          <div class="field">
+            <label for="name" data-i18n="nameLabel">I vostri nomi</label>
+            <p id="name-help" class="help" data-i18n="nameHelp">Il tuo nome e cognome, oppure quelli di entrambi se siete in coppia (es. Vanessa e Marco Rossi).</p>
+            <input id="name" name="name" type="text" maxlength="150" autocomplete="name" required aria-describedby="name-help name-error">
+            <div id="name-error" class="error" role="alert" hidden></div>
+          </div>
+
+          <div class="field">
+            <label for="email" data-i18n="emailLabel">Email</label>
+            <p id="email-help" class="help" data-i18n="emailHelp">Più avanti vi manderemo qui un link personale per confermare la presenza. Potrete rispondere e cambiare la risposta quando volete.</p>
+            <input id="email" name="email" type="email" maxlength="200" autocomplete="email" spellcheck="false" required aria-describedby="email-help email-error">
+            <div id="email-error" class="error" role="alert" hidden></div>
+          </div>
+
+          <div class="field">
+            <label for="phone1" data-i18n="phoneLabel">Cellulare (WhatsApp)</label>
+            <p id="phone1-help" class="help" data-i18n="phoneHelp">Lo useremo solo per mandarvi messaggi dell'ultimo minuto su WhatsApp il giorno del matrimonio.</p>
+            <div class="phone">
+              <select id="cc1" class="cc" data-i18n-aria="ccLabel" aria-label="Prefisso del paese"></select>
+              <input id="phone1" name="phone1" type="tel" maxlength="30" autocomplete="tel" inputmode="tel" required aria-describedby="phone1-help phone1-error">
+            </div>
+            <div id="phone1-error" class="error" role="alert" hidden></div>
+          </div>
+
+          <div class="field">
+            <label for="phone2" data-i18n="phone2Label">Secondo cellulare (facoltativo)</label>
+            <p id="phone2-help" class="help" data-i18n="phone2Help">Per esempio, quello dell'altra persona, se siete in coppia.</p>
+            <div class="phone">
+              <select id="cc2" class="cc" data-i18n-aria="ccLabel" aria-label="Prefisso del paese"></select>
+              <input id="phone2" name="phone2" type="tel" maxlength="30" autocomplete="off" inputmode="tel" aria-describedby="phone2-help phone2-error">
+            </div>
+            <div id="phone2-error" class="error" role="alert" hidden></div>
+          </div>
+
+          <p class="help privacy" data-i18n="privacy">Useremo questi dati solo per organizzare il matrimonio.</p>
+
+          <div class="std-actions">
+            <button type="button" id="cancel-btn" class="btn btn-ghost btn-wide" data-i18n="cancelEdit" hidden>Annulla</button>
+            <button class="btn btn-wide" type="submit" id="send-btn" data-i18n="send">Invia</button>
+          </div>
+          <p id="send-wait" class="wait" role="status" data-i18n="slowWait" hidden>Un attimo, ci vuole qualche secondo…</p>
+          <div id="send-error" class="error" role="alert" hidden></div>
+        </form>
+
+        <p id="demo-note" class="demo-note" data-i18n="demoNote" hidden>Modalità di prova: i dati non vengono inviati a nessuno.</p>
+      </div>
+
+      <!-- dopo l'invio, oppure tornando dallo stesso dispositivo: cosa è stato salvato -->
+      <div id="std-thanks" class="std-thanks" hidden>
+        <h2 id="thanks-title" tabindex="-1"></h2>
+        <p id="thanks-body"></p>
+        <div class="summary">
+          <p data-i18n="summaryIntro">Ecco cosa abbiamo salvato:</p>
+          <dl>
+            <div><dt data-i18n="sumNames">Nomi</dt><dd id="sum-names"></dd></div>
+            <div><dt data-i18n="sumEmail">Email</dt><dd id="sum-email"></dd></div>
+            <div><dt data-i18n="sumPhones">Cellulari</dt><dd id="sum-phones"></dd></div>
+          </dl>
+        </div>
+        <p class="help" data-i18n="editHint">Qualcosa non va? Potete correggere i dati quando volete.</p>
+        <button type="button" id="edit-btn" class="btn btn-ghost" data-i18n="editBtn">Modifica i contatti</button>
+      </div>
     </div>
   </section>
 
@@ -263,7 +194,7 @@
 </footer>
 
 <script src="js/config.js"></script>
-<script src="js/i18n.js"></script>
-<script src="js/main.js"></script>
+<script src="js/save-the-date-i18n.js"></script>
+<script src="js/save-the-date.js"></script>
 </body>
 </html>
