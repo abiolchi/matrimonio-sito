@@ -90,7 +90,7 @@ La lingua iniziale viene scelta in quest'ordine:
 4. l'ultima lingua usata su quel browser, poi la lingua del browser;
 5. l'italiano.
 
-**Link personale da mandare agli ospiti:** `https://vostro-dominio/?code=LIMONE-4K7#rsvp`
+**Link personale da mandare agli ospiti:** `https://alicemaxlerici.it/?code=LIMONE-4K7#rsvp`
 
 ## Controllo automatico delle Pull Request
 
@@ -141,13 +141,23 @@ Il codice del sito sarà visibile a tutti, ma non contiene dati privati: la list
 
 **In alternativa, con il repository privato:** Cloudflare Pages o Netlify, anche loro gratis. Basta collegare il repository GitHub e non impostare nessun comando di build.
 
-### Dominio personalizzato
+### Dominio: alicemaxlerici.it
 
-1. Compra il dominio da un registrar (Cloudflare, Porkbun, OVH, Namecheap…).
-2. GitHub: **Settings → Pages → Custom domain** → inserisci il dominio, poi attiva **Enforce HTTPS**.
-3. Dal registrar, nel DNS:
-   - record `A` del dominio principale verso `185.199.108.153`, `185.199.109.153`, `185.199.110.153` e `185.199.111.153`;
-   - record `CNAME` di `www` verso `<utente>.github.io`.
+Comprato il 28/10/2026 (registro Tucows, privacy WHOIS attiva), **scade il 28/10/2027**: tenete attivo il rinnovo automatico,
+altrimenti qualcun altro potrebbe ricomprarlo e i link già mandati porterebbero da lui.
+Il file `CNAME` nella radice del repo dice a GitHub Pages di usare questo dominio (non cancellatelo).
+
+Per collegarlo, **in quest'ordine**:
+1. Dal registrar, nel DNS del dominio:
+   - quattro record `A` per il dominio principale (`@`): `185.199.108.153`, `185.199.109.153`, `185.199.110.153`, `185.199.111.153`;
+   - un record `CNAME` per `www` verso `abiolchi.github.io`;
+   - togliete eventuali record `A`/`CNAME` "di parcheggio" messi dal registrar.
+2. GitHub, impostazioni del **vostro account** (non del repo): **Settings → Pages → Add a domain** → `alicemaxlerici.it`,
+   aggiungete il record `TXT` che vi mostra e premete **Verify**. Così nessun altro può usare il dominio con un suo sito GitHub.
+3. Merge della Pull Request con il file `CNAME` (o, nel repo, **Settings → Pages → Custom domain** → `alicemaxlerici.it`).
+4. In **Settings → Pages** aspettate che il controllo DNS diventi verde (minuti o qualche ora), poi spuntate **Enforce HTTPS**.
+
+Il vecchio indirizzo `abiolchi.github.io/matrimonio-sito/` porta da solo al dominio. Lo script Google e `js/config.js` non cambiano.
 
 ## Da completare
 
@@ -157,4 +167,4 @@ Il codice del sito sarà visibile a tutti, ma non contiene dati privati: la list
 - [ ] Data limite RSVP: `[DATA]` / `[DATE]` in i18n.js (chiave `rsvpSub`) e `RSVP_DEADLINE` in Code.gs
 - [ ] Sezione viaggio e alloggio
 - [ ] Luogo preciso del civile (Lerici o Tellaro) e link Google Maps; luogo dell'aperitivo di benvenuto
-- [ ] Pubblicazione e dominio
+- [ ] Collegare il dominio alicemaxlerici.it (DNS, verifica su GitHub, Enforce HTTPS: vedi «Dominio») e rinnovarlo prima del 28/10/2027

@@ -60,6 +60,16 @@ def reminders(files):
             "Un testo nuovo va in **italiano, francese e inglese** (il controllo lo verifica).",
         ]))
 
+    if "CNAME" in files:
+        items.append(("🌍 È cambiato il dominio (file CNAME)", [
+            "Il nome nel file `CNAME` deve essere lo stesso di **Settings → Pages → Custom domain** su GitHub e di "
+            "`SITE_DOMAIN` in `tests/controlla_sito.py`.",
+            "I DNS del dominio devono già puntare a GitHub Pages **prima** del merge: altrimenti chi apre il vecchio "
+            "indirizzo github.io viene mandato su un dominio che non risponde.",
+            "Dopo il merge: in **Settings → Pages** aspettate il controllo DNS verde e spuntate **Enforce HTTPS**; "
+            "poi aprite `https://alicemaxlerici.it` e `https://www.alicemaxlerici.it` in incognito.",
+        ]))
+
     if any(f.startswith(("tests/", ".github/")) for f in files):
         items.append(("🔧 Sono cambiati i controlli automatici", [
             "Guardate che «Controllo del sito» sia partito e sia verde in questa Pull Request.",
