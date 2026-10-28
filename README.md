@@ -58,6 +58,8 @@ assets/img/                acquerelli ottimizzati per il web
 assets/favicon.svg
 apps-script/Code.gs        script da incollare nel Google Sheet
 apps-script/GUIDA.md       guida passo passo per collegare il foglio
+tests/controlla_sito.py    controlli automatici (li lancia GitHub a ogni Pull Request)
+.github/workflows/         la pipeline di GitHub Actions
 ```
 
 Non serve nessun build. Per vedere il sito in locale basta aprire `index.html` (la save the date) o `sito-completo.html` nel browser.
@@ -88,6 +90,30 @@ La lingua iniziale viene scelta in quest'ordine:
 5. l'italiano.
 
 **Link personale da mandare agli ospiti:** `https://vostro-dominio/?code=LIMONE-4K7#rsvp`
+
+## Controllo automatico delle Pull Request
+
+A ogni Pull Request verso `main`, GitHub lancia **«Controllo del sito»** (`.github/workflows/controllo-sito.yml`), che apre le pagine in un browser vero e controlla:
+
+- che ogni immagine, CSS e script citato esista, e che ogni testo abbia la traduzione in IT, FR ed EN;
+- save the date e sito completo in tre lingue, su desktop e su telefono: nessun errore JavaScript, nessun testo vuoto, immagini caricate, niente scroll orizzontale;
+- il modulo dei contatti (numeri di prova di vari paesi, errori, invio, riepilogo alla visita successiva);
+- l'RSVP del sito completo con un invitato finto;
+- che `apps-script/Code.gs` non abbia errori di sintassi, e «Controlla i contatti» sui casi tipici.
+
+La rete verso Google è finta: **nessun dato arriva al foglio vero**. Spunta verde = si può unire; rossa = nella pagina della Pull Request, **Checks → Controllo del sito**, c'è l'elenco con ✗ di cosa non va.
+
+**Per rendere il controllo obbligatorio prima del merge** (una volta sola, su GitHub):
+1. **Settings → Branches → Add branch ruleset** (o *Add classic branch protection rule*), per il branch `main`.
+2. Attiva **Require status checks to pass** e aggiungi **«Controllo del sito»** (compare nell'elenco dopo che il controllo è girato almeno una volta).
+3. Salva. Da quel momento il pulsante di merge resta bloccato finché il controllo non è verde.
+
+Per lanciarlo in locale:
+
+```bash
+python3 -m venv .venv && .venv/bin/pip install playwright==1.48.0 && .venv/bin/playwright install chromium
+.venv/bin/python tests/controlla_sito.py
+```
 
 ## Pubblicazione
 

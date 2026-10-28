@@ -43,6 +43,7 @@ Leggi anche README.md e apps-script/GUIDA.md.
 - Sicurezza: la lista non sta mai nel codice del sito; i codici sono casuali; blocco dopo 50 codici sbagliati in 10 minuti; campo trappola per i bot; testi protetti dall'interpretazione come formule.
 
 ## Regole
+- Ogni Pull Request verso main deve passare **«Controllo del sito»** (`.github/workflows/controllo-sito.yml` → `tests/controlla_sito.py`, Python + Playwright, rete Google finta). Se cambi comportamento (testi, prefissi, campi, ID degli elementi, regole di «Controlla i contatti»), aggiorna anche i controlli e lanciali in locale prima del push.
 - Sito statico, niente framework né build step. HTML/CSS/JS semplici.
 - Testi solo in `js/i18n.js` (non scritti a mano nell'HTML se hanno `data-i18n`).
 - `index.html` deve funzionare anche aperto con doppio clic (niente fetch di file locali).
