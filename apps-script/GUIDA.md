@@ -80,7 +80,7 @@ Nella scheda **Invitati**, una riga per invito:
 
 **Attenzione:** se cambiate i nomi di un invito che ha già risposto, chiedete all'invito di rispondere di nuovo, perché le risposte sono legate ai nomi.
 
-**Link personali:** potete mandare a ogni invito il link `https://vostro-dominio/?code=LIMONE-4K7#rsvp`, che apre il modulo già compilato col codice. Si può anche trasformare in QR code da stampare sulla partecipazione.
+**Link personali:** potete mandare a ogni invito il link `https://alicemaxlerici.it/?code=LIMONE-4K7#rsvp`, che apre il modulo già compilato col codice. Si può anche trasformare in QR code da stampare sulla partecipazione.
 
 ## Contatti della "save the date"
 

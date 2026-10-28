@@ -31,6 +31,7 @@ LANGS = ["it", "fr", "en"]
 # js/config.js deve contenere proprio questo: non vuoto (modalità di prova) e non quello
 # di una copia di prova del foglio. Se un giorno create apposta un NUOVO deployment
 # (nuovo indirizzo), aggiornatelo sia in js/config.js sia qui.
+SITE_DOMAIN = "alicemaxlerici.it"  # il dominio comprato da Alice e Max (file CNAME, letto da GitHub Pages)
 PRODUCTION_ENDPOINT = "https://script.google.com/macros/s/AKfycbxwLz1Hx73wcOQtGQdcCOK7nOjv7N1a4Jv9vuILEX0J4i_zeDZgBoY14-SGdWXNwSg/exec"
 SIZES = {"desktop": (1280, 900), "telefono": (390, 844)}
 
@@ -79,6 +80,11 @@ def static_checks():
               " (è vuoto: il sito sarebbe in modalità di prova e non salverebbe niente)" if not endpoint else
               " (c'è un altro indirizzo: è quello di una copia di prova del foglio?)")
     check(endpoint == PRODUCTION_ENDPOINT, "js/config.js usa il deployment vero" + detail)
+
+    section("Dominio (file CNAME)")
+    cname = (ROOT / "CNAME").read_text(encoding="utf-8").strip() if (ROOT / "CNAME").exists() else None
+    check(cname == SITE_DOMAIN, f"CNAME contiene {SITE_DOMAIN}" + ("" if cname == SITE_DOMAIN else
+          " (il file manca: GitHub Pages smetterebbe di usare il dominio)" if cname is None else f" (c'è «{cname}»)"))
 
     section("File citati")
     for name, (page, _) in PAGES.items():

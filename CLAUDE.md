@@ -22,7 +22,9 @@ Leggi anche README.md e apps-script/GUIDA.md.
 ## Contesto e decisioni prese
 - Scopo: prima RSVP, poi aggiungere informazioni man mano (viaggio, alloggio…).
 - Lingue: italiano (predefinita), francese, inglese. Ogni testo nuovo va in tutte e tre.
-- Hosting: niente Azure. GitHub Pages (repo pubblico) oppure Cloudflare Pages (repo privato), più un dominio personalizzato.
+- Hosting: niente Azure. GitHub Pages (repo `abiolchi/matrimonio-sito`, pubblico, branch `main`, radice) con il dominio
+  **alicemaxlerici.it** (file `CNAME`, controllato da `SITE_DOMAIN` in `tests/controlla_sito.py`; scade il 28/10/2027).
+  Il sito è servito dalla radice del dominio: percorsi sempre relativi, mai `/matrimonio-sito/…`.
   `staticwebapp.config.json` è un residuo della vecchia idea Azure e si può cancellare.
 - Stile "Limoni" (mediterraneo ed elegante). Palette e font in `css/style.css` `:root`.
   Gli acquerelli (generati con Gemini) stanno in `assets/img/`; quello del golfo è in trasparenza (~30%) solo nella hero.
@@ -73,5 +75,6 @@ secondo i file cambiati (le stesse che `tests/promemoria.py` scrive come comment
   **Nuova versione** del deployment esistente (mai «Nuovo deployment», che cambia indirizzo); ricaricare il foglio; se cambiano schede/colonne,
   **Prepara il foglio**. Se cambiano insieme sito e script: script pubblicato **prima** del merge.
 - `js/config.js` → deve restare l'indirizzo vero (o aggiornare anche `PRODUCTION_ENDPOINT`).
+- `CNAME` → stesso dominio in GitHub Settings → Pages e in `SITE_DOMAIN`; DNS pronti **prima** del merge; poi Enforce HTTPS.
 - Sito → dopo il merge controllare il sito vero in incognito / dal telefono (cache); testi nelle tre lingue; rimettere l'indirizzo vero se si è provato in modalità di prova.
 Se aggiungi un nuovo tipo di modifica con azioni manuali, aggiungilo anche a `tests/promemoria.py`.
