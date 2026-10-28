@@ -45,9 +45,32 @@ Leggi anche README.md e apps-script/GUIDA.md.
 ## Regole
 - Ogni Pull Request verso main deve passare **«Controllo del sito»** (`.github/workflows/controllo-sito.yml` → `tests/controlla_sito.py`, Python + Playwright, rete Google finta). Se cambi comportamento (testi, prefissi, campi, ID degli elementi, regole di «Controlla i contatti»), aggiorna anche i controlli e lanciali in locale prima del push.
 - Sito statico, niente framework né build step. HTML/CSS/JS semplici.
-- Testi solo in `js/i18n.js` (non scritti a mano nell'HTML se hanno `data-i18n`).
+- Testi solo in `js/i18n.js` / `js/save-the-date-i18n.js` (non scritti a mano nell'HTML se hanno `data-i18n`).
 - `index.html` deve funzionare anche aperto con doppio clic (niente fetch di file locali).
 - Dati che arrivano dal foglio (nomi) → sempre `textContent`, mai `innerHTML`.
-- Dopo ogni modifica a Code.gs va ricordato ad Alice di pubblicare una "Nuova versione" del deployment.
 - Accessibilità: label sui campi, pulsanti ≥ 44px, contrasto buono, funzionare da telefono.
 - Le persone con cui lavori sono Alice e Max; rispondi in italiano salvo richiesta diversa.
+- Lavoro su git: un branch per argomento partito da `main` aggiornato, commit e Pull Request solo quando Alice lo chiede.
+
+## Provare senza toccare il foglio vero
+Il Google Sheet vero contiene (o conterrà) i dati veri degli invitati: **mai** usarlo per le prove.
+1. **Sito** (testi, grafica, modulo): `tests/controlla_sito.py` con la rete Google finta, e a mano la modalità di prova
+   (`endpoint: ""` in `js/config.js`, **solo in locale, mai committato**). Per i controlli nel browser locale servire con
+   `python3 -m http.server` e, se cambi un JS, cambiare host (`localhost` ↔ `127.0.0.1`) o ricaricare senza cache: il browser tiene i JS vecchi.
+2. **Script** (`Code.gs`): la logica pura si prova fuori da Google (vedi `linkContacts_` e il foglio finto in `tests/controlla_sito.py`).
+   Per il resto, Alice la prova su una **copia del foglio** con il suo deployment di prova; l'indirizzo di prova va in `js/config.js` solo in locale.
+3. **Prova finale sul foglio vero**: con l'invito di Alice e Max (`Alice; Max`), non con quello di ospiti veri.
+- `tests/controlla_sito.py` ha `PRODUCTION_ENDPOINT`: il controllo è rosso se `js/config.js` non ha esattamente quell'indirizzo.
+  Se Alice crea apposta un nuovo deployment, vanno aggiornati entrambi.
+- Non inviare mai dati di prova all'endpoint vero senza chiederlo ad Alice.
+
+## Promemoria ad Alice dopo ogni modifica
+Ogni volta che modifichi il sito o lo script, chiudi la risposta con un blocco **«⚠️ Da ricordare»** con le azioni manuali,
+secondo i file cambiati (le stesse che `tests/promemoria.py` scrive come commento nelle Pull Request; puoi lanciarlo con
+`python3 tests/promemoria.py` per avere la lista):
+- `apps-script/Code.gs` → provare su una copia del foglio; incollare il codice in **Estensioni → Apps Script**; pubblicare una
+  **Nuova versione** del deployment esistente (mai «Nuovo deployment», che cambia indirizzo); ricaricare il foglio; se cambiano schede/colonne,
+  **Prepara il foglio**. Se cambiano insieme sito e script: script pubblicato **prima** del merge.
+- `js/config.js` → deve restare l'indirizzo vero (o aggiornare anche `PRODUCTION_ENDPOINT`).
+- Sito → dopo il merge controllare il sito vero in incognito / dal telefono (cache); testi nelle tre lingue; rimettere l'indirizzo vero se si è provato in modalità di prova.
+Se aggiungi un nuovo tipo di modifica con azioni manuali, aggiungilo anche a `tests/promemoria.py`.

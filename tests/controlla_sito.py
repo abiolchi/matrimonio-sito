@@ -26,6 +26,12 @@ PAGES = {
     "sito completo": ("sito-completo.html", "TRANSLATIONS"),
 }
 LANGS = ["it", "fr", "en"]
+
+# L'indirizzo del deployment VERO dello script Google (quello del foglio con i dati veri).
+# js/config.js deve contenere proprio questo: non vuoto (modalità di prova) e non quello
+# di una copia di prova del foglio. Se un giorno create apposta un NUOVO deployment
+# (nuovo indirizzo), aggiornatelo sia in js/config.js sia qui.
+PRODUCTION_ENDPOINT = "https://script.google.com/macros/s/AKfycbxwLz1Hx73wcOQtGQdcCOK7nOjv7N1a4Jv9vuILEX0J4i_zeDZgBoY14-SGdWXNwSg/exec"
 SIZES = {"desktop": (1280, 900), "telefono": (390, 844)}
 
 failures = []
@@ -65,6 +71,15 @@ class Refs(HTMLParser):
 
 
 def static_checks():
+    section("Indirizzo dello script Google (js/config.js)")
+    found = re.search(r'endpoint\s*:\s*"([^"]*)"', (ROOT / "js/config.js").read_text(encoding="utf-8"))
+    endpoint = found.group(1) if found else None
+    detail = ("" if endpoint == PRODUCTION_ENDPOINT else
+              " (non trovo «endpoint» nel file)" if endpoint is None else
+              " (è vuoto: il sito sarebbe in modalità di prova e non salverebbe niente)" if not endpoint else
+              " (c'è un altro indirizzo: è quello di una copia di prova del foglio?)")
+    check(endpoint == PRODUCTION_ENDPOINT, "js/config.js usa il deployment vero" + detail)
+
     section("File citati")
     for name, (page, _) in PAGES.items():
         refs = Refs()
@@ -130,6 +145,7 @@ def fake_google(context, guest=None, sent=None):
 
 def open_page(browser, html, lang, size=(1280, 900), **fake):
     context = browser.new_context(viewport={"width": size[0], "height": size[1]})
+    context.set_default_timeout(10000)
     fake_google(context, **fake)
     page = context.new_page()
     errors = []
@@ -414,16 +430,20 @@ def sheet_checks(browser):
 
 # =========================================================
 
+def run(part, *args):
+    """Lancia un gruppo di controlli; se si blocca, lo segna come fallito e si passa al successivo."""
+    try:
+        part(*args)
+    except Exception as e:
+        check(False, f"{part.__name__}: si è bloccato ({str(e).splitlines()[0][:160]})")
+
+
 def main():
-    static_checks()
+    run(static_checks)
     with sync_playwright() as p:
         browser = p.chromium.launch()
-        translation_checks(browser)
-        page_checks(browser)
-        form_checks(browser)
-        rsvp_checks(browser)
-        apps_script_checks(browser)
-        sheet_checks(browser)
+        for part in (translation_checks, page_checks, form_checks, rsvp_checks, apps_script_checks, sheet_checks):
+            run(part, browser)
         browser.close()
 
     print()

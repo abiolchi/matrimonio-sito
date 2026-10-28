@@ -1,5 +1,6 @@
 # Controllo del sito a ogni Pull Request verso main.
-# Apre le pagine in un browser vero e controlla che tutto funzioni (vedi tests/controlla_sito.py).
+# 1. Promemoria: scrive nella Pull Request cosa fare a mano, secondo i file cambiati (tests/promemoria.py).
+# 2. Controllo: apre le pagine in un browser vero e controlla che tutto funzioni (tests/controlla_sito.py).
 # Se il controllo è verde, la Pull Request si può unire.
 
 name: Controllo del sito
@@ -11,6 +12,7 @@ on:
 
 permissions:
   contents: read
+  pull-requests: write   # per scrivere il commento con il promemoria
 
 jobs:
   controllo:
@@ -19,10 +21,25 @@ jobs:
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # serve la storia per sapere quali file cambiano
 
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+
+      - name: Promemoria per la Pull Request
+        if: github.event_name == 'pull_request'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR: ${{ github.event.pull_request.number }}
+        run: |
+          python tests/promemoria.py "origin/${{ github.base_ref }}"
+          if [ -f promemoria.md ]; then
+            cat promemoria.md >> "$GITHUB_STEP_SUMMARY"
+            # un solo commento, aggiornato a ogni push
+            gh pr comment "$PR" --edit-last --body-file promemoria.md || gh pr comment "$PR" --body-file promemoria.md
+          fi
 
       - name: Installa il browser per i controlli
         run: |

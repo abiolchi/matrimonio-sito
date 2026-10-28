@@ -59,6 +59,7 @@ assets/favicon.svg
 apps-script/Code.gs        script da incollare nel Google Sheet
 apps-script/GUIDA.md       guida passo passo per collegare il foglio
 tests/controlla_sito.py    controlli automatici (li lancia GitHub a ogni Pull Request)
+tests/promemoria.py        promemoria «Da ricordare» scritto nelle Pull Request
 .github/workflows/         la pipeline di GitHub Actions
 ```
 
@@ -95,6 +96,7 @@ La lingua iniziale viene scelta in quest'ordine:
 
 A ogni Pull Request verso `main`, GitHub lancia **«Controllo del sito»** (`.github/workflows/controllo-sito.yml`), che apre le pagine in un browser vero e controlla:
 
+- che `js/config.js` contenga l'indirizzo del deployment **vero** dello script Google (non vuoto, non quello di una copia di prova);
 - che ogni immagine, CSS e script citato esista, e che ogni testo abbia la traduzione in IT, FR ed EN;
 - save the date e sito completo in tre lingue, su desktop e su telefono: nessun errore JavaScript, nessun testo vuoto, immagini caricate, niente scroll orizzontale;
 - il modulo dei contatti (numeri di prova di vari paesi, errori, invio, riepilogo alla visita successiva);
@@ -114,6 +116,18 @@ Per lanciarlo in locale:
 python3 -m venv .venv && .venv/bin/pip install playwright==1.48.0 && .venv/bin/playwright install chromium
 .venv/bin/python tests/controlla_sito.py
 ```
+
+### 📋 Il promemoria nella Pull Request
+
+Nella stessa Pull Request GitHub scrive anche un **commento «Da ricordare per questa modifica»** (e un avviso giallo tra i controlli) con le cose da fare **a mano**, secondo i file cambiati: per esempio, se cambia `apps-script/Code.gs`, incollarlo in Apps Script e pubblicare una nuova versione del deployment. Il commento si aggiorna a ogni nuovo push. Per vederlo in locale: `python3 tests/promemoria.py`.
+
+## Provare le modifiche senza toccare i dati veri
+
+Quando il Google Sheet contiene gli invitati veri, **non usatelo per le prove**:
+
+1. **Modifiche al sito** (testi, grafica, modulo): bastano il «Controllo del sito» e, a mano, la **modalità di prova**: in `js/config.js` mettete `endpoint: ""` **solo sul vostro computer** e aprite la pagina con doppio clic. Prima del commit rimettete l'indirizzo vero (se ve lo dimenticate, il controllo diventa rosso).
+2. **Modifiche allo script** (`Code.gs`): nel foglio vero **File → Crea una copia** (es. «Matrimonio – PROVE»); nella copia **Estensioni → Apps Script → Esegui il deployment → Nuovo deployment** (App web): è un indirizzo solo per le prove. Incollate lì il codice nuovo, mettete quell'indirizzo in `js/config.js` solo in locale e provate tutto. Quando funziona: codice nel foglio vero + **nuova versione** del deployment vero, e indirizzo vero di nuovo in `config.js`.
+3. **Prova finale sul foglio vero**: con il **vostro** invito (`Alice; Max` in Invitati), non con quello di un ospite.
 
 ## Pubblicazione
 
