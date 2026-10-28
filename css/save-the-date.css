@@ -53,6 +53,15 @@ html { scroll-padding-top: 88px; }
 .std-mini .facts { font-size: 15px; margin: 0; }
 .std-mini .map-link { padding-bottom: 0; }
 
+/* la frase sotto la festa di domenica */
+.std-joy { margin: 4px 0 0; line-height: 1.6; }
+
+/* colonna di destra: il NB per gli invitati, poi il modulo */
+.std-main { display: flex; flex-direction: column; gap: 28px; min-width: 0; }
+.std-message p { margin: 0; line-height: 1.6; }
+.std-nb { font-size: 15px; color: var(--navy-soft); }
+.std-nb strong { font-weight: 500; color: var(--navy); }
+
 /* foto in bianco e nero con una cornice gialla spostata */
 .std-photo { position: relative; margin: 0 20px 20px 0; }
 .std-photo::before {
