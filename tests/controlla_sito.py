@@ -178,6 +178,16 @@ def page_checks(browser):
                 if size_name == "telefono":
                     wide = page.evaluate("document.documentElement.scrollWidth")
                     check(wide <= size[0], f"[{where}] niente scroll orizzontale (larghezza {wide}px)")
+                if html == "index.html":
+                    # la banda con le lingue resta in alto anche in fondo alla pagina, e si può cliccare
+                    reachable = page.evaluate("""() => {
+                        document.documentElement.style.scrollBehavior = 'auto';
+                        window.scrollTo(0, document.documentElement.scrollHeight);
+                        const b = document.querySelector('.langs button[data-lang="en"]').getBoundingClientRect();
+                        const hit = document.elementFromPoint(b.left + b.width / 2, b.top + b.height / 2);
+                        return window.scrollY > 0 && b.top >= 0 && b.bottom <= 100 && !!hit && !!hit.closest('.langs');
+                    }""")
+                    check(reachable, f"[{where}] in fondo alla pagina le lingue sono ancora visibili in alto")
                 check(not errors, f"[{where}] nessun errore JavaScript" + (f": {errors[0]}" if errors else ""))
                 context.close()
 
@@ -200,6 +210,16 @@ PHONE_CASES = [
 ]
 
 
+def under_bar(page, element_id):
+    """True se l'elemento (dopo lo scorrimento della pagina) è nascosto sotto la banda fissa o fuori schermo."""
+    page.wait_for_timeout(900)  # lo scorrimento è morbido
+    return page.evaluate("""id => {
+        const bar = document.querySelector('.std-bar').getBoundingClientRect();
+        const el = document.getElementById(id).getBoundingClientRect();
+        return el.top < bar.bottom || el.bottom > window.innerHeight;
+    }""", element_id)
+
+
 def form_checks(browser):
     section("Save the date: modulo contatti")
     sent = []
@@ -207,6 +227,7 @@ def form_checks(browser):
 
     page.click("#send-btn")
     check(page.evaluate("document.activeElement.id") == "name", "modulo vuoto: il cursore va sul primo campo")
+    check(not under_bar(page, "name"), "modulo vuoto: il campo col cursore non finisce sotto la banda in alto")
     check(page.is_visible("#phone1-error"), "modulo vuoto: errore sul cellulare")
     check(not sent, "modulo vuoto: non viene inviato niente")
 
@@ -256,8 +277,10 @@ def form_checks(browser):
     page.wait_for_load_state("load")
     check(page.is_visible("#std-thanks") and not page.is_visible("#contact-form"),
           "visita successiva dallo stesso dispositivo: mostra il riepilogo")
+    page.evaluate("window.scrollTo(0, document.documentElement.scrollHeight)")
     page.click("#edit-btn")
     check(page.input_value("#email2") == "marco@example.com", "«Modifica i contatti» riempie il modulo")
+    check(not under_bar(page, "name"), "«Modifica i contatti»: il primo campo non finisce sotto la banda in alto")
     check(not errors, "nessun errore JavaScript" + (f": {errors[0]}" if errors else ""))
     context.close()
 
