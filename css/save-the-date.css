@@ -3,6 +3,17 @@
    colori, font, pulsanti e campi. Qui solo quello che è nuovo.
    ========================================================= */
 
+/* ---------- Banda fissa in alto (A & M + lingue) ---------- */
+.std-bar {
+  position: sticky; top: 0; z-index: 10;
+  background: rgba(251, 247, 238, .94); /* --cream, appena trasparente */
+  -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+  border-bottom: 1px solid var(--line);
+}
+.std-bar .top { padding-top: 10px; padding-bottom: 10px; flex-wrap: nowrap; }
+/* quando la pagina scorre fino a un campo (errore, "Modifica i contatti"), la banda non lo copre */
+html { scroll-padding-top: 88px; }
+
 /* ---------- Hero ---------- */
 .std-hero .hero-inner { padding-bottom: 72px; gap: 16px; }
 .std-kicker { margin-top: 8px; }

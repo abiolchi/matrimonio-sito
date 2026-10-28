@@ -10,6 +10,7 @@ Leggi anche README.md e apps-script/GUIDA.md.
 ## Stato attuale: pagina "Save the date"
 - `index.html` è per ora una save the date che raccoglie i contatti, **un modulo per invito** (singolo, coppia o famiglia): nomi, email, cellulare WhatsApp; facoltativi, raggruppati sotto «Se siete in coppia»: seconda email e secondo cellulare. Niente "aggiungi un'altra persona".
   Dopo l'invio i dati restano in `localStorage` (`stdContact`): a una visita successiva dallo stesso dispositivo si vede il riepilogo con "Modifica i contatti". I dati non vengono mai riletti dal foglio (nessuno deve poter vedere i contatti altrui).
+  In alto una banda fissa (`.std-bar`, sticky) con «A & M» e le lingue. Per spostare il cursore su un campo usare `focusInView()` (lo porta a metà schermo): con `focus()` semplice Chrome lo lascia sotto la banda.
   Colonna sinistra: programma (domenica a Villa Marigola in grande, poi "Il giorno prima" con civile e aperitivo del sabato affiancati; niente orari precisi), poi la foto. Colonna destra: il modulo.
   File suoi: `css/save-the-date.css` (dopo `css/style.css`), `js/save-the-date-i18n.js` (`window.STD_TRANSLATIONS`), `js/save-the-date.js`, foto `assets/img/alice-max.jpg`.
 - Il sito completo è in `sito-completo.html` (nessun link dalla save the date). Rispetto all'originale sono cambiati solo l'acquerello di Villa Marigola (`villa-marigola-giardino.jpg`) e il civile: sabato 18/9, mattina, Lerici / Tellaro (anche in `js/i18n.js` e nelle colonne/Riepilogo di `Code.gs`). Per il resto non modificarlo finché resta nascosto, salvo richiesta.

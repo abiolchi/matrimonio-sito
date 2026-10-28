@@ -309,16 +309,22 @@
     });
   }
 
+  // Dà il cursore a un elemento e lo porta a metà schermo: lasciato in cima,
+  // finirebbe sotto la banda fissa con le lingue
+  function focusInView(el) {
+    el.focus({ preventScroll: true });
+    el.scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "center" });
+  }
+
   $("edit-btn").addEventListener("click", function () {
     fillForm();
     show("form");
-    $("std-title").scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" });
-    $("name").focus({ preventScroll: true });
+    focusInView($("name"));
   });
 
   $("cancel-btn").addEventListener("click", function () {
     show("saved");
-    $("thanks-title").focus();
+    focusInView($("thanks-title"));
   });
 
   $("contact-form").addEventListener("submit", function (e) {
@@ -327,7 +333,7 @@
 
     var firstBad = null;
     FIELDS.forEach(function (id) { if (!check(id) && !firstBad) firstBad = id; });
-    if (firstBad) { $(firstBad).focus(); return; }
+    if (firstBad) { focusInView($(firstBad)); return; }
 
     var phones = [], entered = [];
     PHONES.forEach(function (n) {
@@ -354,7 +360,7 @@
           saved = { name: name, email: email, email2: email2, phones: entered, savedAt: new Date().toISOString() };
           storeSaved(saved);
           show("thanks");
-          $("thanks-title").focus();
+          focusInView($("thanks-title"));
           return;
         }
         showSendError(res && res.error === "busy" ? "errBusy" : "errSend");
