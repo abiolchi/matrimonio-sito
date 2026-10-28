@@ -70,6 +70,8 @@
           </div>
         </article>
 
+        <p class="std-joy" data-i18n="joyText">La nostra gioia più grande sarebbe avervi tutti con noi in questo giorno importante. Non vediamo l'ora di festeggiare insieme!</p>
+
         <!-- eventi collaterali, per chi è già in zona il giorno prima -->
         <div class="std-before">
           <div class="card-day" data-i18n="beforeDay">Sabato 18 settembre 2027 · Il giorno prima</div>
@@ -78,7 +80,7 @@
             <article class="std-mini">
               <h3 data-i18n="ev2Title">Matrimonio civile</h3>
               <dl class="facts">
-                <div><dt data-i18n="labelWhen">Quando</dt><dd data-i18n="ev2When">Mattina</dd></div>
+                <div><dt data-i18n="labelWhen">Quando</dt><dd data-i18n="ev2When">Sabato 18, mattina</dd></div>
                 <div><dt data-i18n="labelPlace">Luogo</dt><dd>Lerici / Tellaro</dd></div>
               </dl>
             </article>
@@ -86,6 +88,7 @@
               <h3 data-i18n="ev3Title">Aperitivo di benvenuto</h3>
               <dl class="facts">
                 <div><dt data-i18n="labelWhen">Quando</dt><dd data-i18n="ev3When">Sera</dd></div>
+                <div><dt data-i18n="labelPlace">Luogo</dt><dd data-i18n="ev3Place">Da definire</dd></div>
               </dl>
             </article>
           </div>
@@ -97,91 +100,97 @@
       </figure>
     </div>
 
-    <div class="std-card">
-      <div id="std-form-box">
-        <h2 id="std-title" data-i18n="formTitle">I vostri contatti</h2>
-        <p class="std-intro" data-i18n="intro">L'invito vero e proprio arriverà più avanti. Intanto lasciateci i vostri contatti, così sappiamo dove mandarvelo.</p>
-
-        <form id="contact-form" class="stack" novalidate>
-          <!-- trappola per i bot: invisibile alle persone -->
-          <div class="hp" aria-hidden="true">
-            <label for="website">Website</label>
-            <input id="website" name="website" type="text" tabindex="-1" autocomplete="off">
-          </div>
-
-          <div class="field">
-            <label for="name" data-i18n="nameLabel">I vostri nomi</label>
-            <p id="name-help" class="help" data-i18n="nameHelp">Il tuo nome e cognome, oppure quelli di entrambi se siete in coppia (es. Vanessa e Marco Rossi).</p>
-            <input id="name" name="name" type="text" maxlength="150" autocomplete="name" required aria-describedby="name-help name-error">
-            <div id="name-error" class="error" role="alert" hidden></div>
-          </div>
-
-          <div class="field">
-            <label for="email" data-i18n="emailLabel">Email</label>
-            <p id="email-help" class="help" data-i18n="emailHelp">Più avanti vi manderemo qui un link personale per confermare la presenza. Potrete rispondere e cambiare la risposta quando volete.</p>
-            <input id="email" name="email" type="email" maxlength="200" autocomplete="email" spellcheck="false" required aria-describedby="email-help email-error">
-            <div id="email-error" class="error" role="alert" hidden></div>
-          </div>
-
-          <div class="field">
-            <label for="phone1" data-i18n="phoneLabel">Cellulare (WhatsApp)</label>
-            <p id="phone1-help" class="help" data-i18n="phoneHelp">Lo useremo solo per mandarvi messaggi dell'ultimo minuto su WhatsApp il giorno del matrimonio.</p>
-            <div class="phone">
-              <select id="cc1" class="cc" data-i18n-aria="ccLabel" aria-label="Prefisso del paese"></select>
-              <input id="phone1" name="phone1" type="tel" maxlength="30" autocomplete="tel" inputmode="tel" required aria-describedby="phone1-help phone1-error">
-            </div>
-            <div id="phone1-error" class="error" role="alert" hidden></div>
-          </div>
-
-          <!-- campi facoltativi, per l'altra persona della coppia -->
-          <fieldset class="optional">
-            <legend data-i18n="optLegend">Se siete in coppia (facoltativo)</legend>
-
-            <div class="field">
-              <label for="email2" data-i18n="email2Label">Seconda email</label>
-              <p id="email2-help" class="help" data-i18n="email2Help">Se volete ricevere entrambi le nostre email.</p>
-              <input id="email2" name="email2" type="email" maxlength="200" autocomplete="off" spellcheck="false" aria-describedby="email2-help email2-error">
-              <div id="email2-error" class="error" role="alert" hidden></div>
-            </div>
-
-            <div class="field">
-              <label for="phone2" data-i18n="phone2Label">Secondo cellulare (WhatsApp)</label>
-              <p id="phone2-help" class="help" data-i18n="phone2Help">Se volete ricevere entrambi i messaggi del giorno del matrimonio.</p>
-              <div class="phone">
-                <select id="cc2" class="cc" data-i18n-aria="ccLabel" aria-label="Prefisso del paese"></select>
-                <input id="phone2" name="phone2" type="tel" maxlength="30" autocomplete="off" inputmode="tel" aria-describedby="phone2-help phone2-error">
-              </div>
-              <div id="phone2-error" class="error" role="alert" hidden></div>
-            </div>
-          </fieldset>
-
-          <p class="help privacy" data-i18n="privacy">Useremo questi dati solo per organizzare il matrimonio.</p>
-
-          <div class="std-actions">
-            <button type="button" id="cancel-btn" class="btn btn-ghost btn-wide" data-i18n="cancelEdit" hidden>Annulla</button>
-            <button class="btn btn-wide" type="submit" id="send-btn" data-i18n="send">Invia</button>
-          </div>
-          <p id="send-wait" class="wait" role="status" data-i18n="slowWait" hidden>Un attimo, ci vuole qualche secondo…</p>
-          <div id="send-error" class="error" role="alert" hidden></div>
-        </form>
-
-        <p id="demo-note" class="demo-note" data-i18n="demoNote" hidden>Modalità di prova: i dati non vengono inviati a nessuno.</p>
+    <div class="std-main">
+      <div class="std-message">
+        <p class="std-nb"><strong data-i18n="nbLabel">NB:</strong> <span data-i18n="nbText">compilare questo modulo non conferma ufficialmente la vostra presenza: ci serve solo per raccogliere i vostri contatti e per farvi segnare la data sul calendario. Riceverete un invito personalizzato nei prossimi mesi, avete ancora tempo per pensarci!</span></p>
       </div>
 
-      <!-- dopo l'invio, oppure tornando dallo stesso dispositivo: cosa è stato salvato -->
-      <div id="std-thanks" class="std-thanks" hidden>
-        <h2 id="thanks-title" tabindex="-1"></h2>
-        <p id="thanks-body"></p>
-        <div class="summary">
-          <p data-i18n="summaryIntro">Ecco cosa abbiamo salvato:</p>
-          <dl>
-            <div><dt data-i18n="sumNames">Nomi</dt><dd id="sum-names"></dd></div>
-            <div><dt data-i18n="sumEmail">Email</dt><dd id="sum-email"></dd></div>
-            <div><dt data-i18n="sumPhones">Cellulari</dt><dd id="sum-phones"></dd></div>
-          </dl>
+      <div class="std-card">
+        <div id="std-form-box">
+          <h2 id="std-title" data-i18n="formTitle">I vostri contatti</h2>
+          <p class="std-intro" data-i18n="intro">L'invito vero e proprio arriverà più avanti. Intanto lasciateci i vostri contatti, così sappiamo dove mandarvelo.</p>
+
+          <form id="contact-form" class="stack" novalidate>
+            <!-- trappola per i bot: invisibile alle persone -->
+            <div class="hp" aria-hidden="true">
+              <label for="website">Website</label>
+              <input id="website" name="website" type="text" tabindex="-1" autocomplete="off">
+            </div>
+
+            <div class="field">
+              <label for="name" data-i18n="nameLabel">I vostri nomi</label>
+              <p id="name-help" class="help" data-i18n="nameHelp">Il tuo nome e cognome, oppure quelli di entrambi se siete in coppia (es. Vanessa e Marco, Vanessa e Marco Rossi oppure Vanessa Bianchi e Marco Rossi, come preferite).</p>
+              <input id="name" name="name" type="text" maxlength="150" autocomplete="name" required aria-describedby="name-help name-error">
+              <div id="name-error" class="error" role="alert" hidden></div>
+            </div>
+
+            <div class="field">
+              <label for="email" data-i18n="emailLabel">Email</label>
+              <p id="email-help" class="help" data-i18n="emailHelp">Più avanti vi manderemo qui un link personale per confermare la presenza. Potrete rispondere e cambiare la risposta quando volete.</p>
+              <input id="email" name="email" type="email" maxlength="200" autocomplete="email" spellcheck="false" required aria-describedby="email-help email-error">
+              <div id="email-error" class="error" role="alert" hidden></div>
+            </div>
+
+            <div class="field">
+              <label for="phone1" data-i18n="phoneLabel">Cellulare (WhatsApp)</label>
+              <p id="phone1-help" class="help" data-i18n="phoneHelp">Lo useremo solo per mandarvi messaggi dell'ultimo minuto su WhatsApp il giorno del matrimonio.</p>
+              <div class="phone">
+                <select id="cc1" class="cc" data-i18n-aria="ccLabel" aria-label="Prefisso del paese"></select>
+                <input id="phone1" name="phone1" type="tel" maxlength="30" autocomplete="tel" inputmode="tel" required aria-describedby="phone1-help phone1-error">
+              </div>
+              <div id="phone1-error" class="error" role="alert" hidden></div>
+            </div>
+
+            <!-- campi facoltativi, per l'altra persona della coppia -->
+            <fieldset class="optional">
+              <legend data-i18n="optLegend">Se siete in coppia (facoltativo)</legend>
+
+              <div class="field">
+                <label for="email2" data-i18n="email2Label">Seconda email</label>
+                <p id="email2-help" class="help" data-i18n="email2Help">Se volete ricevere entrambi le nostre email.</p>
+                <input id="email2" name="email2" type="email" maxlength="200" autocomplete="off" spellcheck="false" aria-describedby="email2-help email2-error">
+                <div id="email2-error" class="error" role="alert" hidden></div>
+              </div>
+
+              <div class="field">
+                <label for="phone2" data-i18n="phone2Label">Secondo cellulare (WhatsApp)</label>
+                <p id="phone2-help" class="help" data-i18n="phone2Help">Se volete ricevere entrambi i messaggi del giorno del matrimonio.</p>
+                <div class="phone">
+                  <select id="cc2" class="cc" data-i18n-aria="ccLabel" aria-label="Prefisso del paese"></select>
+                  <input id="phone2" name="phone2" type="tel" maxlength="30" autocomplete="off" inputmode="tel" aria-describedby="phone2-help phone2-error">
+                </div>
+                <div id="phone2-error" class="error" role="alert" hidden></div>
+              </div>
+            </fieldset>
+
+            <p class="help privacy" data-i18n="privacy">Useremo questi dati solo per organizzare il matrimonio.</p>
+
+            <div class="std-actions">
+              <button type="button" id="cancel-btn" class="btn btn-ghost btn-wide" data-i18n="cancelEdit" hidden>Annulla</button>
+              <button class="btn btn-wide" type="submit" id="send-btn" data-i18n="send">Invia</button>
+            </div>
+            <p id="send-wait" class="wait" role="status" data-i18n="slowWait" hidden>Un attimo, ci vuole qualche secondo…</p>
+            <div id="send-error" class="error" role="alert" hidden></div>
+          </form>
+
+          <p id="demo-note" class="demo-note" data-i18n="demoNote" hidden>Modalità di prova: i dati non vengono inviati a nessuno.</p>
         </div>
-        <p class="help" data-i18n="editHint">Qualcosa non va? Potete correggere i dati quando volete.</p>
-        <button type="button" id="edit-btn" class="btn btn-ghost" data-i18n="editBtn">Modifica i contatti</button>
+
+        <!-- dopo l'invio, oppure tornando dallo stesso dispositivo: cosa è stato salvato -->
+        <div id="std-thanks" class="std-thanks" hidden>
+          <h2 id="thanks-title" tabindex="-1"></h2>
+          <p id="thanks-body"></p>
+          <div class="summary">
+            <p data-i18n="summaryIntro">Ecco cosa abbiamo salvato:</p>
+            <dl>
+              <div><dt data-i18n="sumNames">Nomi</dt><dd id="sum-names"></dd></div>
+              <div><dt data-i18n="sumEmail">Email</dt><dd id="sum-email"></dd></div>
+              <div><dt data-i18n="sumPhones">Cellulari</dt><dd id="sum-phones"></dd></div>
+            </dl>
+          </div>
+          <p class="help" data-i18n="editHint">Qualcosa non va? Potete correggere i dati quando volete.</p>
+          <button type="button" id="edit-btn" class="btn btn-ghost" data-i18n="editBtn">Modifica i contatti</button>
+        </div>
       </div>
     </div>
   </section>
@@ -196,8 +205,8 @@
     <svg viewBox="0 0 64 64"><g stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M33 8v36" fill="none"/><path d="M33 10l15 30H33z" fill="#FBF7EE"/><path d="M31 15L19 40h12z" fill="#E8B931"/><path d="M12 45h40l-6 7H18z" fill="currentColor"/><path d="M4 59c5-3 9-3 14 0s9 3 14 0 9-3 14 0 9 3 14 0" fill="none"/></g></svg>
     <!-- castello di San Giorgio -->
     <svg viewBox="0 0 64 64" class="big"><g stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M5 57c4-6 10-9 16-8 4-5 14-6 20-2 6-2 14 2 18 10z" fill="#D9CBA6"/><path d="M20 49V24h24v25" fill="#F3EBD7"/><path d="M18 24V18h4v3h4v-3h4v3h4v-3h4v3h4v-3h4v6z" fill="#F3EBD7"/><path d="M29 49v-7a3 3 0 0 1 6 0v7z" fill="currentColor"/><path d="M32 18V7" fill="none"/><path d="M32 7l8 2.5-8 2.5z" fill="#E8B931"/></g><g fill="currentColor"><rect x="24.5" y="29" width="3" height="5"/><rect x="36.5" y="29" width="3" height="5"/></g></svg>
-    <!-- limone -->
-    <svg viewBox="0 0 64 64"><g stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><ellipse cx="30" cy="38" rx="19" ry="13.5" transform="rotate(-30 30 38)" fill="#E8B931"/><path d="M46.5 28.5l3-3M13.5 47.5l-3 3" fill="none"/><path d="M49.5 25.5c1-8 7-12 12-12 0 7-5 12-12 12z" fill="#8FA876"/><path d="M49.5 25.5l7-7" fill="none"/></g></svg>
+    <!-- basilico -->
+    <svg viewBox="0 0 64 64"><g stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"><path d="M32 61C32 52 31 42 32 26" fill="none"/><path d="M31 48C26 54 12 54 5 44C9 33 25 35 31 48z" fill="#7FA06A"/><path d="M33 42C38 48 52 48 59 38C55 27 39 29 33 42z" fill="#7FA06A"/><path d="M32 30C25 31 17 25 17 17C25 14 31 21 32 30z" fill="#A3BD8A"/><path d="M32 28C39 29 47 23 47 15C39 12 33 19 32 28z" fill="#A3BD8A"/><path d="M31 48C23 43 14 42 5 44M33 42C41 37 50 36 59 38M32 30C28 25 23 20 17 17M32 28C36 23 41 18 47 15" fill="none" stroke-width="1.1"/></g></svg>
     <!-- sole sul mare -->
     <svg viewBox="0 0 64 64"><g stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"><path d="M18 40a14 14 0 0 1 28 0z" fill="#E8B931"/><path d="M32 20v-7M20 27l-5-5M44 27l5-5M13 38H6M51 38h7" fill="none"/><path d="M4 47c5-3 9-3 14 0s9 3 14 0 9-3 14 0 9 3 14 0" fill="none"/><path d="M4 55c5-3 9-3 14 0s9 3 14 0 9-3 14 0 9 3 14 0" fill="none" opacity=".55"/></g></svg>
   </div>
