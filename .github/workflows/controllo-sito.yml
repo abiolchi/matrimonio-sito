@@ -1,0 +1,33 @@
+# Controllo del sito a ogni Pull Request verso main.
+# Apre le pagine in un browser vero e controlla che tutto funzioni (vedi tests/controlla_sito.py).
+# Se il controllo è verde, la Pull Request si può unire.
+
+name: Controllo del sito
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  controllo:
+    name: Controllo del sito
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Installa il browser per i controlli
+        run: |
+          pip install playwright==1.48.0
+          playwright install --with-deps chromium
+
+      - name: Controlla il sito
+        run: python tests/controlla_sito.py

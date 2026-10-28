@@ -9,3 +9,7 @@ node_modules/
 /Gemini_Generated_Image_*.jpg
 /italian hand.jpg
 *.textClipping
+
+# Ambiente Python per lanciare i controlli in locale (tests/controlla_sito.py)
+.venv/
+__pycache__/
