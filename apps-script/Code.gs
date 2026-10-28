@@ -369,78 +369,112 @@ var INVITE_LINK_HEADERS = ['Email', 'Email 2', 'Cellulare (WhatsApp)', 'Cellular
 var INVITE_LINK_FIRST_COLUMN = 6;                        // F, subito dopo "Note (private)"
 
 function checkContacts() {
-  var ss = SpreadsheetApp.getActive();
-  var ui = SpreadsheetApp.getUi();
-  var guestsSheet = ss.getSheetByName(SHEET_GUESTS);
-  if (!guestsSheet || guestsSheet.getLastRow() < 2) {
-    ui.alert('La scheda Invitati è vuota: prima inserite la lista degli inviti.');
-    return;
-  }
-
   var message;
   var lock = LockService.getScriptLock();
   lock.waitLock(20000);
   try {
-    var newCodes = fillMissingCodes_(guestsSheet);
-    var contactsSheet = getOrCreateContactsSheet_(ss);
-
-    var guestRows = guestsSheet.getRange(2, 1, guestsSheet.getLastRow() - 1, 2).getValues();
-    var invites = guestRows.map(function (r) {
-      return { code: String(r[0]).trim(), names: String(r[1]).split(/[;\n]/).map(function (x) { return x.trim(); }).filter(String) };
-    });
-
-    var lastContact = contactsSheet.getLastRow();
-    var contactRows = lastContact >= 2 ? contactsSheet.getRange(2, 1, lastContact - 1, CONTACT_HEADERS.length).getValues() : [];
-    var contacts = contactRows.map(function (r) {
-      return { name: String(r[1]), emails: [r[2], r[3]], phones: [r[4], r[5]], code: String(r[7]).trim() };
-    });
-
-    var result = linkContacts_(invites, contacts);
-
-    // Contatti: codici nuovi, colori e note (le vostre note sulla cella del nome restano)
-    if (contacts.length) {
-      var codeRange = contactsSheet.getRange(2, 8, contacts.length, 1);
-      var codes = codeRange.getValues();
-      result.contacts.forEach(function (c, i) { if (c.newCode) codes[i][0] = c.newCode; });
-      codeRange.setValues(codes);
-
-      contactsSheet.getRange(2, 1, contacts.length, CONTACT_HEADERS.length).setBackgrounds(
-        result.contacts.map(function (c) { return CONTACT_HEADERS.map(function () { return checkColor_(c.status); }); }));
-
-      var noteRange = contactsSheet.getRange(2, 2, contacts.length, 1);
-      var notes = noteRange.getNotes();
-      result.contacts.forEach(function (c, i) {
-        var old = notes[i][0];
-        if (old && old.indexOf(CHECK_NOTE) !== 0) return;
-        notes[i][0] = c.notes.length ? CHECK_NOTE + c.notes.join('\n') : '';
-      });
-      noteRange.setNotes(notes);
-    }
-
-    // Invitati: colori e colonne con email e cellulari presi da Contatti
-    var inviteCount = guestRows.length;
-    var linkColumns = INVITE_LINK_FIRST_COLUMN + INVITE_LINK_HEADERS.length - 1;
-    guestsSheet.getRange(2, 1, inviteCount, linkColumns).setBackgrounds(
-      result.invites.map(function (inv) {
-        var row = [];
-        for (var k = 0; k < linkColumns; k++) row.push(checkColor_(inv.status));
-        return row;
-      }));
-    var linksWritten = writeInviteLinks_(guestsSheet, inviteCount);
-
-    var t = result.totals;
-    message = 'Controllo fatto.\n\n' +
-      '🟢 Contatti collegati a un invito: ' + t.linked + (t.newLinks ? ' (' + t.newLinks + ' collegati adesso)' : '') + '\n' +
-      '🟡 Contatti da controllare: ' + t.check + '\n' +
-      '⚪ Contatti senza un invito corrispondente: ' + t.unmatched + '\n' +
-      '⚪ Inviti senza contatto: ' + t.invitesWithout + '\n' +
-      (newCodes ? '\nCodici nuovi generati in Invitati: ' + newCodes + '\n' : '') +
-      (t.check ? '\nIl motivo dei gialli è nella nota sulla cella del nome (in Contatti): passateci sopra col mouse.' : '') +
-      (linksWritten ? '' : '\n\n⚠️ In Invitati le colonne F–I non sono vuote: non ho aggiunto email e cellulari. Liberatele e rilanciate.');
+    message = runContactCheck_(SpreadsheetApp.getActive());
   } finally {
     lock.releaseLock();
   }
-  ui.alert(message);
+  SpreadsheetApp.getUi().alert(message);
+}
+
+function runContactCheck_(ss) {
+  var guestsSheet = ss.getSheetByName(SHEET_GUESTS);
+  var contactsSheet = getOrCreateContactsSheet_(ss);
+  var linkColumns = INVITE_LINK_FIRST_COLUMN + INVITE_LINK_HEADERS.length - 1;
+
+  // Prima si toglie tutto quello che aveva segnato il controllo precedente (colori e note 🔎),
+  // anche sulle righe ormai vuote: se avete cancellato delle righe, il foglio torna pulito.
+  clearCheckMarks_(contactsSheet, CONTACT_HEADERS.length, 2);
+  if (guestsSheet) clearCheckMarks_(guestsSheet, linkColumns, 0);
+
+  if (!guestsSheet || lastDataRow_(guestsSheet, 2) < 2) {
+    if (guestsSheet) writeInviteLinks_(guestsSheet, 0);
+    return 'La scheda Invitati è vuota: ho solo tolto i colori e le note del controllo precedente.\n\n' +
+      'Inserite la lista degli inviti e rilanciate il controllo.';
+  }
+
+  var newCodes = fillMissingCodes_(guestsSheet);
+  var inviteCount = lastDataRow_(guestsSheet, 2) - 1;
+  var guestRows = guestsSheet.getRange(2, 1, inviteCount, 2).getValues();
+  var invites = guestRows.map(function (r) {
+    return { code: String(r[0]).trim(), names: String(r[1]).split(/[;\n]/).map(function (x) { return x.trim(); }).filter(String) };
+  });
+
+  var contactCount = lastDataRow_(contactsSheet, CONTACT_HEADERS.length) - 1;
+  var contactRows = contactCount > 0 ? contactsSheet.getRange(2, 1, contactCount, CONTACT_HEADERS.length).getValues() : [];
+  var contacts = contactRows.map(function (r) {
+    return { name: String(r[1]), emails: [r[2], r[3]], phones: [r[4], r[5]], code: String(r[7]).trim() };
+  });
+
+  var result = linkContacts_(invites, contacts);
+
+  // Contatti: codici nuovi, colori e note (le vostre note sulla cella del nome restano)
+  if (contacts.length) {
+    var codeRange = contactsSheet.getRange(2, 8, contacts.length, 1);
+    var codes = codeRange.getValues();
+    result.contacts.forEach(function (c, i) { if (c.newCode) codes[i][0] = c.newCode; });
+    codeRange.setValues(codes);
+
+    contactsSheet.getRange(2, 1, contacts.length, CONTACT_HEADERS.length).setBackgrounds(
+      result.contacts.map(function (c) { return CONTACT_HEADERS.map(function () { return checkColor_(c.status); }); }));
+
+    var noteRange = contactsSheet.getRange(2, 2, contacts.length, 1);
+    var notes = noteRange.getNotes();
+    result.contacts.forEach(function (c, i) {
+      if (notes[i][0] || !c.notes.length) return;
+      notes[i][0] = CHECK_NOTE + c.notes.join('\n');
+    });
+    noteRange.setNotes(notes);
+  }
+
+  // Invitati: colori e colonne con email e cellulari presi da Contatti
+  guestsSheet.getRange(2, 1, inviteCount, linkColumns).setBackgrounds(
+    result.invites.map(function (inv) {
+      var row = [];
+      for (var k = 0; k < linkColumns; k++) row.push(checkColor_(inv.status));
+      return row;
+    }));
+  var linksWritten = writeInviteLinks_(guestsSheet, inviteCount);
+
+  var t = result.totals;
+  return 'Controllo fatto.\n\n' +
+    '🟢 Contatti collegati a un invito: ' + t.linked + (t.newLinks ? ' (' + t.newLinks + ' collegati adesso)' : '') + '\n' +
+    '🟡 Contatti da controllare: ' + t.check + '\n' +
+    '⚪ Contatti senza un invito corrispondente: ' + t.unmatched + '\n' +
+    '⚪ Inviti senza contatto: ' + t.invitesWithout + '\n' +
+    (newCodes ? '\nCodici nuovi generati in Invitati: ' + newCodes + '\n' : '') +
+    (t.check ? '\nIl motivo dei gialli è nella nota sulla cella del nome (in Contatti): passateci sopra col mouse.' : '') +
+    (linksWritten ? '' : '\n\n⚠️ In Invitati le colonne F–I non sono vuote: non ho aggiunto email e cellulari. Liberatele e rilanciate.');
+}
+
+// Toglie colori e note 🔎 di un controllo precedente su tutte le righe sotto l'intestazione,
+// comprese quelle ormai vuote. Le note scritte da voi restano.
+function clearCheckMarks_(sheet, columns, noteColumn) {
+  var rows = sheet.getMaxRows() - 1;
+  if (rows < 1) return;
+  sheet.getRange(2, 1, rows, columns).setBackground(null);
+  if (!noteColumn) return;
+  var range = sheet.getRange(2, noteColumn, rows, 1);
+  var notes = range.getNotes();
+  var changed = false;
+  notes.forEach(function (r) {
+    if (r[0] && r[0].indexOf(CHECK_NOTE) === 0) { r[0] = ''; changed = true; }
+  });
+  if (changed) range.setNotes(notes);
+}
+
+// L'ultima riga con qualcosa scritto nelle prime colonne (le formule più a destra non contano)
+function lastDataRow_(sheet, columns) {
+  var last = sheet.getLastRow();
+  if (last < 2) return 1;
+  var values = sheet.getRange(2, 1, last - 1, columns).getValues();
+  for (var i = values.length - 1; i >= 0; i--) {
+    if (values[i].some(function (v) { return String(v).trim() !== ''; })) return i + 2;
+  }
+  return 1;
 }
 
 /* Il cuore del controllo, senza leggere né scrivere il foglio (così si può provare anche fuori).
@@ -628,7 +662,10 @@ function writeInviteLinks_(sheet, count) {
         SHEET_CONTACTS + '!$H:$H;0))&"";""))';
     }));
   }
-  sheet.getRange(2, INVITE_LINK_FIRST_COLUMN, count, INVITE_LINK_HEADERS.length).setFormulas(formulas);
+  if (count) sheet.getRange(2, INVITE_LINK_FIRST_COLUMN, count, INVITE_LINK_HEADERS.length).setFormulas(formulas);
+  // sotto l'ultimo invito, niente formule rimaste da righe cancellate
+  var below = sheet.getMaxRows() - count - 1;
+  if (below > 0) sheet.getRange(count + 2, INVITE_LINK_FIRST_COLUMN, below, INVITE_LINK_HEADERS.length).clearContent();
   for (var c = 0; c < INVITE_LINK_HEADERS.length; c++) sheet.setColumnWidth(INVITE_LINK_FIRST_COLUMN + c, c < 2 ? 220 : 160);
   return true;
 }

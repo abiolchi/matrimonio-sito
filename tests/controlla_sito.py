@@ -314,6 +314,105 @@ def apps_script_checks(browser):
 
 
 # =========================================================
+# 6. "Controlla i contatti" su un foglio finto
+# =========================================================
+
+# Una piccola imitazione di Google Sheets: solo quello che usa Code.gs nel controllo.
+FAKE_SHEETS_JS = r"""
+window.makeSpreadsheet = function (tabs) {
+  const sheets = {};
+  const make = (name, rows) => {
+    const S = { data: rows.map(r => r.slice()), bg: {}, notes: {}, maxRows: 60 };
+    const get = (r, c) => { const v = (S.data[r - 1] || [])[c - 1]; return v === undefined ? '' : v; };
+    const put = (r, c, v) => { while (S.data.length < r) S.data.push([]); S.data[r - 1][c - 1] = v; };
+    const each = (r, c, nr, nc, fn) => { for (let i = 0; i < nr; i++) for (let j = 0; j < nc; j++) fn(r + i, c + j, i, j); };
+    S.getName = () => name;
+    S.getMaxRows = () => S.maxRows;
+    S.getIndex = () => Object.keys(sheets).indexOf(name) + 1;
+    S.getLastRow = () => { for (let r = S.data.length; r >= 1; r--) if ((S.data[r - 1] || []).some(v => v !== '' && v != null)) return r; return 0; };
+    S.setFrozenRows = () => S; S.setColumnWidth = () => S; S.insertColumnAfter = () => S;
+    S.getRange = (r, c, nr = 1, nc = 1) => {
+      const R = {
+        getValue: () => get(r, c),
+        getValues: () => Array.from({ length: nr }, (_, i) => Array.from({ length: nc }, (_, j) => get(r + i, c + j))),
+        setValue: v => { put(r, c, v); return R; },
+        setValues: m => { each(r, c, nr, nc, (a, b, i, j) => put(a, b, m[i][j])); return R; },
+        setFormulas: m => { each(r, c, nr, nc, (a, b, i, j) => put(a, b, m[i][j])); return R; },
+        clearContent: () => { each(r, c, nr, nc, (a, b) => put(a, b, '')); return R; },
+        setBackground: v => { each(r, c, nr, nc, (a, b) => { S.bg[a + ',' + b] = v; }); return R; },
+        setBackgrounds: m => { each(r, c, nr, nc, (a, b, i, j) => { S.bg[a + ',' + b] = m[i][j]; }); return R; },
+        getNotes: () => Array.from({ length: nr }, (_, i) => Array.from({ length: nc }, (_, j) => S.notes[(r + i) + ',' + (c + j)] || '')),
+        setNotes: m => { each(r, c, nr, nc, (a, b, i, j) => { S.notes[a + ',' + b] = m[i][j]; }); return R; },
+        setFontWeight: () => R
+      };
+      return R;
+    };
+    sheets[name] = S;
+    return S;
+  };
+  Object.keys(tabs).forEach(n => make(n, tabs[n]));
+  const ss = {
+    sheets,
+    getSheetByName: n => sheets[n] || null,
+    insertSheet: n => make(n, []),
+    getActiveSheet: () => null, setActiveSheet: () => {}, moveActiveSheet: () => {}
+  };
+  window.SpreadsheetApp = { getActive: () => ss, getUi: () => ({ alert: m => { window.lastAlert = m; } }) };
+  window.LockService = { getScriptLock: () => ({ waitLock() {}, releaseLock() {} }) };
+  return ss;
+};
+"""
+
+
+def sheet_checks(browser):
+    section("«Controlla i contatti» su un foglio finto")
+    page = browser.new_page()
+    page.set_content("<!doctype html><title>t</title>")
+    page.add_script_tag(content=(ROOT / "apps-script/Code.gs").read_text(encoding="utf-8"))
+    page.add_script_tag(content=FAKE_SHEETS_JS)
+    r = page.evaluate("""() => {
+        const H = CONTACT_HEADERS;
+        let n = 0;  // ogni riga con un cellulare diverso (i doppioni sono solo quelli voluti)
+        const row = (name, email, code) => [new Date(), name, email, '', "'+3933300000" + (n++), '', 'it', code || '', ''];
+        const ss = makeSpreadsheet({
+            Contatti: [H, row('Veronica e Matteo Rossi', 'v@x.it'), row('Claire', 'c@x.fr'), row('claire', 'C@X.FR'), row('Pinco', 'p@x.it')],
+            Invitati: [GUEST_HEADERS, ['', 'Veronica; Matteo', 'it', 'sì', ''], ['', 'Claire', 'fr', 'no', 'nota nostra']]
+        });
+        const C = ss.sheets.Contatti, I = ss.sheets.Invitati;
+        C.notes['5,2'] = 'nota nostra';   // una nota vostra sul nome di Pinco: deve restare
+        checkContacts();
+        const first = {
+            code: C.data[1][7], inviteCode: I.data[1][0],
+            green: C.bg['2,1'], yellow: C.bg['3,1'], none: C.bg['5,1'],
+            note: C.notes['3,2'] || '', ourNote: C.notes['5,2'],
+            email: I.data[1][5], alert: lastAlert
+        };
+        // cancello tutti i contatti e rilancio
+        C.data = [H];
+        checkContacts();
+        const leftBg = Object.keys(C.bg).filter(k => C.bg[k]).length + Object.keys(I.bg).filter(k => I.bg[k]).length;
+        const leftNotes = Object.values(C.notes).filter(n => n && n.indexOf(CHECK_NOTE) === 0).length;
+        const afterContacts = { leftBg, leftNotes, ourNote: C.notes['5,2'] };
+        // cancello anche gli inviti (restano solo le formule a destra) e rilancio
+        I.data = I.data.map((r, i) => i === 0 ? r : ['', '', '', '', ''].concat(r.slice(5)));
+        checkContacts();
+        const formulas = I.data.slice(1).filter(r => r.slice(5, 9).some(v => v)).length;
+        return { first, afterContacts, formulas, alert: lastAlert };
+    }""")
+    f = r["first"]
+    check(f["code"] and f["code"] == f["inviteCode"], "la coppia riceve il codice del suo invito")
+    check(f["green"] == "#d9ead3" and f["yellow"] == "#fff2cc" and f["none"] is None, "colori: verde, giallo, nessuno")
+    check(f["note"].startswith("🔎") and "doppione" in f["note"], "il doppione ha la nota 🔎 col motivo")
+    check(f["ourNote"] == "nota nostra", "le vostre note restano")
+    check(f["email"].startswith("=IF(") and "Contatti!$C:$C" in f["email"], "in Invitati compaiono le formule delle email")
+    a = r["afterContacts"]
+    check(a["leftBg"] == 0 and a["leftNotes"] == 0, "Contatti svuotato: il controllo toglie tutti i colori e le note 🔎")
+    check(a["ourNote"] == "nota nostra", "Contatti svuotato: le vostre note restano")
+    check(r["formulas"] == 0 and "vuota" in r["alert"], "Invitati svuotato: via anche le formule rimaste, e lo dice")
+    page.close()
+
+
+# =========================================================
 
 def main():
     static_checks()
@@ -324,6 +423,7 @@ def main():
         form_checks(browser)
         rsvp_checks(browser)
         apps_script_checks(browser)
+        sheet_checks(browser)
         browser.close()
 
     print()
