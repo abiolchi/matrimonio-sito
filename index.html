@@ -130,15 +130,27 @@
             <div id="phone1-error" class="error" role="alert" hidden></div>
           </div>
 
-          <div class="field">
-            <label for="phone2" data-i18n="phone2Label">Secondo cellulare (facoltativo)</label>
-            <p id="phone2-help" class="help" data-i18n="phone2Help">Per esempio, quello dell'altra persona, se siete in coppia.</p>
-            <div class="phone">
-              <select id="cc2" class="cc" data-i18n-aria="ccLabel" aria-label="Prefisso del paese"></select>
-              <input id="phone2" name="phone2" type="tel" maxlength="30" autocomplete="off" inputmode="tel" aria-describedby="phone2-help phone2-error">
+          <!-- campi facoltativi, per l'altra persona della coppia -->
+          <fieldset class="optional">
+            <legend data-i18n="optLegend">Se siete in coppia (facoltativo)</legend>
+
+            <div class="field">
+              <label for="email2" data-i18n="email2Label">Seconda email</label>
+              <p id="email2-help" class="help" data-i18n="email2Help">Se volete ricevere entrambi le nostre email.</p>
+              <input id="email2" name="email2" type="email" maxlength="200" autocomplete="off" spellcheck="false" aria-describedby="email2-help email2-error">
+              <div id="email2-error" class="error" role="alert" hidden></div>
             </div>
-            <div id="phone2-error" class="error" role="alert" hidden></div>
-          </div>
+
+            <div class="field">
+              <label for="phone2" data-i18n="phone2Label">Secondo cellulare (WhatsApp)</label>
+              <p id="phone2-help" class="help" data-i18n="phone2Help">Se volete ricevere entrambi i messaggi del giorno del matrimonio.</p>
+              <div class="phone">
+                <select id="cc2" class="cc" data-i18n-aria="ccLabel" aria-label="Prefisso del paese"></select>
+                <input id="phone2" name="phone2" type="tel" maxlength="30" autocomplete="off" inputmode="tel" aria-describedby="phone2-help phone2-error">
+              </div>
+              <div id="phone2-error" class="error" role="alert" hidden></div>
+            </div>
+          </fieldset>
 
           <p class="help privacy" data-i18n="privacy">Useremo questi dati solo per organizzare il matrimonio.</p>
 
