@@ -20,8 +20,19 @@ var SHEET_ANSWERS = 'Risposte';
 var SHEET_LOG = 'Storico';
 var SHEET_SUMMARY = 'Riepilogo';
 
-var GUEST_HEADERS = ['Codice', 'Nomi (separati da ;)', 'Lingua (it / fr / en)', 'Invitati al civile (sì / no)', 'Note (private)'];
-var ANSWER_HEADERS = ['Data risposta', 'Codice', 'Nome', 'Domenica 19/9 – cerimonia e ricevimento', 'Lunedì 20/9 – matrimonio civile', 'Lingua', '+1 (accompagnatore)'];
+// Save the date: scheda dei contatti (sempre la prima del file).
+// Le ultime due colonne sono vostre: lo script non le scrive mai.
+var SHEET_CONTACTS = 'Contatti';
+// Una riga per invito (singolo, coppia o famiglia).
+var CONTACT_HEADERS = ['Data', 'Nomi', 'Email', 'Cellulare (WhatsApp)', 'Cellulare 2', 'Lingua', 'Codice invito', 'Note (private)'];
+var CONTACT_SCRIPT_COLUMNS = 6; // da "Data" a "Lingua"
+// Protezione: al massimo tanti invii di contatti ogni 10 minuti, in tutto.
+var MAX_CONTACTS_PER_WINDOW = 150;
+var CONTACT_WINDOW_SECONDS = 600;
+
+var GUEST_HEADERS =['Codice', 'Nomi (separati da ;)', 'Lingua (it / fr / en)', 'Invitati al civile (sì / no)', 'Note (private)'];
+// Nel codice "monday" vuol dire il matrimonio civile (nome rimasto da quando era di lunedì: ora è sabato 18/9).
+var ANSWER_HEADERS = ['Data risposta', 'Codice', 'Nome', 'Domenica 19/9 – cerimonia e ricevimento', 'Sabato 18/9 – matrimonio civile', 'Lingua', '+1 (accompagnatore)'];
 var LOG_HEADERS = ['Data', 'Codice', 'Azione', 'Dettaglio (JSON)'];
 
 // Invitati di prova: gli stessi della modalità di prova del sito.
@@ -53,6 +64,8 @@ function onOpen() {
 function setupSheets() {
   var ss = SpreadsheetApp.getActive();
 
+  getOrCreateContactsSheet_(ss);
+
   var guests = getOrCreateSheet_(ss, SHEET_GUESTS, GUEST_HEADERS);
   if (guests.getLastRow() < 2) {
     guests.getRange(2, 1, TEST_GUESTS.length, TEST_GUESTS[0].length).setValues(TEST_GUESTS);
@@ -71,9 +84,10 @@ function setupSheets() {
     ['Inviti che hanno risposto', '=COUNTUNIQUEIFS(Risposte!B2:B;Risposte!B2:B;"<>")'],
     ['Domenica – ci saranno', '=COUNTIF(Risposte!D2:D;"Sì")'],
     ['Domenica – non ci saranno', '=COUNTIF(Risposte!D2:D;"No")'],
-    ['Lunedì (civile) – ci saranno', '=COUNTIF(Risposte!E2:E;"Sì")'],
-    ['Lunedì (civile) – non ci saranno', '=COUNTIF(Risposte!E2:E;"No")'],
-    ['Accompagnatori (+1)', '=COUNTIF(Risposte!G2:G;"Sì")']
+    ['Sabato (civile) – ci saranno', '=COUNTIF(Risposte!E2:E;"Sì")'],
+    ['Sabato (civile) – non ci saranno', '=COUNTIF(Risposte!E2:E;"No")'],
+    ['Accompagnatori (+1)', '=COUNTIF(Risposte!G2:G;"Sì")'],
+    ['Contatti ricevuti (save the date)', '=COUNTA(Contatti!C2:C)']
   ];
   // Formule col ";" come separatore, perché il foglio è in italiano.
   // Se un giorno il foglio passa a una lingua con la virgola (es. inglese), vanno cambiati in ",".
@@ -128,6 +142,7 @@ function doPost(e) {
     return json_({ ok: false, error: 'bad_request' });
   }
   if (data && data.website) return json_({ ok: true }); // campo trappola compilato: è un bot
+  if (data && data.action === 'contact') return json_(saveContact_(data)); // pagina "save the date"
   return json_(save_(data || {}));
 }
 
@@ -212,6 +227,103 @@ function save_(data) {
     lock.releaseLock();
   }
   return { ok: true, updatedAt: now.toISOString() };
+}
+
+
+/* ---------- Save the date: contatti ---------- */
+
+// Salva nomi, email e cellulari nella scheda "Contatti".
+// Se l'email c'è già (maiuscole o minuscole non contano), aggiorna quella riga.
+// Se l'ospite corregge l'email dallo stesso dispositivo, il sito manda anche
+// previousEmail: in quel caso si aggiorna la riga della vecchia email.
+function saveContact_(data) {
+  if (contactLimitReached_()) return { ok: false, error: 'busy' };
+
+  var name = String(data.name || '').trim().slice(0, 150);
+  var email = String(data.email || '').trim().slice(0, 200);
+  var previousEmail = String(data.previousEmail || '').trim().toLowerCase();
+  if (!name || !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) return { ok: false, error: 'invalid' };
+
+  var phones = [];
+  var given = Array.isArray(data.phones) ? data.phones : [];
+  for (var i = 0; i < given.length; i++) {
+    var phone = String(given[i] || '').trim();
+    if (!phone) continue;
+    if (!/^\+\d{7,15}$/.test(phone)) return { ok: false, error: 'invalid' };
+    if (phones.indexOf(phone) === -1) phones.push(phone);
+  }
+  if (!phones.length || phones.length > 2) return { ok: false, error: 'invalid' };
+
+  var lang = LANGS.indexOf(data.lang) > -1 ? data.lang : 'it';
+  var now = new Date();
+  var values = [
+    now,
+    safeText_(name),
+    safeText_(email),
+    safeText_(phones[0]), // safeText_ evita che "+39…" venga letto come formula
+    safeText_(phones[1] || ''),
+    lang
+  ];
+
+  var lock = LockService.getScriptLock();
+  lock.waitLock(20000);
+  try {
+    var ss = SpreadsheetApp.getActive();
+    var sheet = getOrCreateContactsSheet_(ss);
+
+    var row = 0, previousRow = 0;
+    var last = sheet.getLastRow();
+    if (last >= 2) {
+      var emails = sheet.getRange(2, 3, last - 1, 1).getValues();
+      var wanted = email.toLowerCase();
+      for (var r = 0; r < emails.length; r++) {
+        var cell = String(emails[r][0]).replace(/^'/, '').trim().toLowerCase();
+        if (cell === wanted) { row = r + 2; break; }
+        if (previousEmail && cell === previousEmail && !previousRow) previousRow = r + 2;
+      }
+    }
+    row = row || previousRow;
+    // solo le colonne dello script: "Codice invito" e "Note (private)" restano come sono
+    sheet.getRange(row || last + 1, 1, 1, CONTACT_SCRIPT_COLUMNS).setValues([values]);
+
+    var log = ss.getSheetByName(SHEET_LOG) || getOrCreateSheet_(ss, SHEET_LOG, LOG_HEADERS);
+    log.appendRow([
+      now, '', row ? 'Contatti aggiornati' : 'Nuovi contatti',
+      safeText_(JSON.stringify({ name: name, email: email, phones: phones, lang: lang }))
+    ]);
+  } finally {
+    lock.releaseLock();
+  }
+  return { ok: true };
+}
+
+// La scheda "Contatti", creata se manca e sempre spostata al primo posto
+function getOrCreateContactsSheet_(ss) {
+  var sheet = ss.getSheetByName(SHEET_CONTACTS);
+  if (!sheet) {
+    sheet = ss.insertSheet(SHEET_CONTACTS, 0);
+    sheet.getRange(1, 1, 1, CONTACT_HEADERS.length).setValues([CONTACT_HEADERS]).setFontWeight('bold');
+    sheet.setFrozenRows(1);
+    sheet.setColumnWidth(1, 150).setColumnWidth(2, 200).setColumnWidth(3, 240)
+      .setColumnWidth(4, 170).setColumnWidth(5, 150)
+      .setColumnWidth(7, 130).setColumnWidth(8, 240);
+  }
+  if (sheet.getIndex() !== 1) {
+    var active = ss.getActiveSheet();
+    ss.setActiveSheet(sheet);
+    ss.moveActiveSheet(1);
+    if (active) ss.setActiveSheet(active);
+  }
+  return sheet;
+}
+
+// true se negli ultimi 10 minuti sono già arrivati troppi invii di contatti
+function contactLimitReached_() {
+  var cache = CacheService.getScriptCache();
+  var n = Number(cache.get('contacts') || 0);
+  if (n >= MAX_CONTACTS_PER_WINDOW) return true;
+  cache.put('contacts', String(n + 1), CONTACT_WINDOW_SECONDS);
+  return false;
 }
 
 

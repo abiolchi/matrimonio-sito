@@ -1,12 +1,39 @@
-# Max & Alice · Lerici · 19–20 settembre 2027
+# Max & Alice · Lerici · 18–19 settembre 2027
 
 Sito del matrimonio, con le informazioni per gli ospiti e un RSVP personalizzato, in italiano, francese e inglese.
 Lo stile è "Limoni": crema, blu mare, accento giallo limone, font Cormorant Garamond e Jost, acquerelli di Lerici.
 
-- **Domenica 19/9:** cerimonia simbolica e ricevimento, Villa Marigola, 16:00–02:00
-- **Lunedì 20/9:** matrimonio civile, Castello / Municipio di Lerici, 12:30
+- **Sabato 18/9:** matrimonio civile a Lerici / Tellaro (mattina) e aperitivo di benvenuto (sera)
+- **Domenica 19/9:** cerimonia simbolica e ricevimento, Villa Marigola, dal pomeriggio fino a tarda notte
 
-## Come funziona
+
+## Per ora: pagina "Save the date"
+
+Al momento `index.html` è una pagina **save the date** che raccoglie i contatti, un modulo per invito (singolo, coppia o famiglia): nomi, email, cellulare WhatsApp e un secondo cellulare facoltativo. I contatti finiscono nella scheda **Contatti** del Google Sheet.
+Dopo l'invio i dati restano anche nel browser dell'ospite: tornando sulla pagina dallo stesso dispositivo vede cosa ha salvato e può correggerlo.
+Il sito completo (programma, viaggio, RSVP) è in `sito-completo.html`, uguale a prima salvo il civile spostato a sabato 18/9 e il nuovo acquerello di Villa Marigola: non ha link dalla nuova pagina, ma chi conosce l'indirizzo può ancora aprirlo.
+
+```
+index.html                 save the date: hero, programma + foto, modulo contatti
+css/save-the-date.css      stile in più (si carica dopo css/style.css)
+js/save-the-date-i18n.js   testi della save the date nelle tre lingue
+js/save-the-date.js        cambio lingua + controllo dei numeri + invio
+assets/img/alice-max.jpg   la nostra foto (bianco e nero, 900×724)
+sito-completo.html         il sito completo, identico a prima
+```
+
+### Tornare al sito completo
+
+Quando è il momento di aprire l'RSVP:
+
+```bash
+git mv index.html save-the-date.html
+git mv sito-completo.html index.html
+```
+
+Poi commit e push. Non serve cambiare nient'altro: il sito completo è già aggiornato con il civile di sabato, e lo script Google gestisce sia l'RSVP sia i contatti.
+
+## Come funziona l'RSVP
 
 ```
 Sito statico (GitHub Pages)  ──codice invito──▶  Google Apps Script  ──▶  Google Sheet
@@ -21,7 +48,8 @@ Sito statico (GitHub Pages)  ──codice invito──▶  Google Apps Script  �
 ## Struttura
 
 ```
-index.html                 pagina unica: hero, programma, viaggio, RSVP
+index.html                 per ora la save the date (vedi sopra)
+sito-completo.html         sito completo: hero, programma, viaggio, RSVP
 css/style.css              stile; colori e font in :root
 js/config.js               indirizzo dello script Google (vuoto = modalità di prova)
 js/i18n.js                 TUTTI i testi nelle tre lingue
@@ -32,11 +60,11 @@ apps-script/Code.gs        script da incollare nel Google Sheet
 apps-script/GUIDA.md       guida passo passo per collegare il foglio
 ```
 
-Non serve nessun build. Per vedere il sito in locale basta aprire `index.html` nel browser.
+Non serve nessun build. Per vedere il sito in locale basta aprire `index.html` (la save the date) o `sito-completo.html` nel browser.
 
 ## Modalità di prova
 
-Finché `js/config.js` ha `endpoint: ""`, il modulo usa 4 invitati finti e le risposte restano nel browser:
+Finché `js/config.js` ha `endpoint: ""`, la save the date finge di salvare i contatti (non li manda a nessuno) e il modulo RSVP usa 4 invitati finti, con le risposte che restano nel browser:
 
 | Codice | Invitati | Lingua | Civile |
 |---|---|---|---|
@@ -49,7 +77,7 @@ Per collegare il Google Sheet vero, segui **`apps-script/GUIDA.md`**.
 
 ## Modificare i testi
 
-I testi stanno in `js/i18n.js`. Ogni elemento in `index.html` con `data-i18n="chiave"` prende il testo da lì nella lingua scelta. Una chiave nuova va aggiunta in **tutte e tre** le lingue. Le chiavi `…_one` sono la versione per una persona sola.
+I testi della save the date stanno in `js/save-the-date-i18n.js`, quelli del sito completo in `js/i18n.js`. Ogni elemento in `index.html` con `data-i18n="chiave"` prende il testo da lì nella lingua scelta. Una chiave nuova va aggiunta in **tutte e tre** le lingue. Le chiavi `…_one` sono la versione per una persona sola.
 
 La lingua iniziale viene scelta in quest'ordine:
 
@@ -83,8 +111,10 @@ Il codice del sito sarà visibile a tutti, ma non contiene dati privati: la list
 
 ## Da completare
 
+- [ ] Incollare il nuovo `Code.gs` e pubblicare una **nuova versione** del deployment (serve per salvare i contatti della save the date)
+- [ ] Al momento dell'RSVP: tornare al sito completo (vedi sopra) e mandare a ogni contatto il suo link personale
 - [ ] Collegare il Google Sheet (`apps-script/GUIDA.md`) e inserire la lista invitati vera
 - [ ] Data limite RSVP: `[DATA]` / `[DATE]` in i18n.js (chiave `rsvpSub`) e `RSVP_DEADLINE` in Code.gs
 - [ ] Sezione viaggio e alloggio
-- [ ] Link Google Maps preciso per il municipio / castello (ora è una ricerca "Castello di Lerici")
+- [ ] Luogo preciso del civile (Lerici o Tellaro) e link Google Maps; luogo dell'aperitivo di benvenuto
 - [ ] Pubblicazione e dominio

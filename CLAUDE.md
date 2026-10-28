@@ -1,10 +1,22 @@
 # Note per Claude
 
 Sito del matrimonio di Max & Alice a Lerici (Golfo dei Poeti, Liguria).
-- **Domenica 19/9/2027:** cerimonia simbolica e ricevimento, Villa Marigola, 16:00–02:00.
-- **Lunedì 20/9/2027:** matrimonio civile, Castello / Municipio di Lerici, 12:30.
+- **Sabato 18/9/2027:** matrimonio civile a Lerici / Tellaro (mattina, luogo preciso da definire: per ora niente link mappa) e aperitivo di benvenuto (sera, luogo da definire). Eventi collaterali per chi è già in zona.
+- **Domenica 19/9/2027:** cerimonia simbolica e ricevimento, Villa Marigola, dal pomeriggio fino a tarda notte (16:00–02:00).
+- Nel codice dell'RSVP `mon`/`monday`/`msgMondayOnly` vuol dire **il civile** (nomi rimasti da quando era di lunedì): non rinominarli, sono il formato fra sito e foglio.
 
 Leggi anche README.md e apps-script/GUIDA.md.
+
+## Stato attuale: pagina "Save the date"
+- `index.html` è per ora una save the date che raccoglie i contatti, **un modulo per invito** (singolo, coppia o famiglia): nomi, email, cellulare WhatsApp + 1 facoltativo. Niente "aggiungi un'altra persona".
+  Dopo l'invio i dati restano in `localStorage` (`stdContact`): a una visita successiva dallo stesso dispositivo si vede il riepilogo con "Modifica i contatti". I dati non vengono mai riletti dal foglio (nessuno deve poter vedere i contatti altrui).
+  Colonna sinistra: programma (domenica a Villa Marigola in grande, poi "Il giorno prima" con civile e aperitivo del sabato affiancati; niente orari precisi), poi la foto. Colonna destra: il modulo.
+  File suoi: `css/save-the-date.css` (dopo `css/style.css`), `js/save-the-date-i18n.js` (`window.STD_TRANSLATIONS`), `js/save-the-date.js`, foto `assets/img/alice-max.jpg`.
+- Il sito completo è in `sito-completo.html` (nessun link dalla save the date). Rispetto all'originale sono cambiati solo l'acquerello di Villa Marigola (`villa-marigola-giardino.jpg`) e il civile: sabato 18/9, mattina, Lerici / Tellaro (anche in `js/i18n.js` e nelle colonne/Riepilogo di `Code.gs`). Per il resto non modificarlo finché resta nascosto, salvo richiesta.
+- Per tornare al sito completo: `git mv index.html save-the-date.html` e `git mv sito-completo.html index.html` (vedi README).
+- Invio: POST `{ action: "contact", name, email, phones: ["+32…"], lang, website, previousEmail? }` (previousEmail se l'email salvata sul dispositivo è cambiata) all'`endpoint` di `js/config.js`; endpoint vuoto = finto invio.
+  Numeri: prefissi IT BE FR UK US PL NL CH (iniziale secondo la lingua della pagina: it → IT, fr → BE, en → UK), cifra nazionale tolta (0, o 1 per gli USA; in Italia lo 0 resta), salvati come `+32470123456`.
+- `Code.gs`: `doPost` manda `action === 'contact'` a `saveContact_`, che scrive nella scheda **Contatti** (sempre la prima; colonne "Codice invito" e "Note (private)" solo nostre), aggiorna la riga se l'email (o previousEmail) esiste già, max 150 invii ogni 10 minuti, riga nello Storico.
 
 ## Contesto e decisioni prese
 - Scopo: prima RSVP, poi aggiungere informazioni man mano (viaggio, alloggio…).
@@ -19,10 +31,10 @@ Leggi anche README.md e apps-script/GUIDA.md.
   - `js/config.js` → `endpoint` vuoto = modalità di prova con 4 invitati finti (gli stessi di TEST_GUESTS in Code.gs).
   - Il flusso ricalca il vecchio modulo Tally "RSVP - Wedding of Alice & Max" (id eq1dQ0):
     1. Parte 1 (domenica): sì/no per persona; sotto ogni persona compare un riquadro giallo (sunYes / sunNo "Perché?? 🤌🏼"). Niente messaggio libero.
-    2. Parte 2 (civile): solo se l'invito ha "Invitati al civile = sì"; sotto ogni persona un messaggio secondo la sua combinazione domenica+lunedì (msgBoth / msgSundayOnly / msgMondayOnly / msgNone).
+    2. Parte 2 (civile): solo se l'invito ha "Invitati al civile = sì"; sotto ogni persona un messaggio secondo la sua combinazione domenica+civile (msgBoth / msgSundayOnly / msgMondayOnly / msgNone).
     +1: ogni invito con una sola persona può mettere il tick "+1" e scrivere il nome dell'accompagnatore (obbligatorio).
       Tick nella Parte 1 → il +1 viene domenica (niente sì/no); nella Parte 2 ha la sua riga sì/no per il civile.
-      Nessun tick nella Parte 1 → nella Parte 2 ricompare il tick: se lo mette, il +1 viene solo lunedì.
+      Nessun tick nella Parte 1 → nella Parte 2 ricompare il tick: se lo mette, il +1 viene solo al civile.
       Il tick è chiaro e bloccato finché l'invitato non risponde "Ci sarò" a quell'evento; se passa a "no" si toglie da solo. In Risposte è una riga in più con "Sì" nella colonna G "+1 (accompagnatore)".
     3. Grazie: simboli di Lerici in SVG e l'acquerello con la didascalia "non rispecchia la realtà".
 - Sicurezza: la lista non sta mai nel codice del sito; i codici sono casuali; blocco dopo 50 codici sbagliati in 10 minuti; campo trappola per i bot; testi protetti dall'interpretazione come formule.

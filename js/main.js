@@ -5,7 +5,8 @@
    1. l'ospite inserisce il codice dell'invito (o arriva con ?code=…)
    2. Parte 1 – domenica (cerimonia simbolica + ricevimento): una risposta per persona;
       sotto ogni persona compare un messaggio ("Evviva!" oppure "Perché?? 🤌🏼")
-   3. Parte 2 – lunedì (matrimonio civile), solo se l'invito lo prevede;
+   3. Parte 2 – matrimonio civile (sabato 18/9), solo se l'invito lo prevede;
+      nel codice "mon"/"monday" vuol dire il civile (nome rimasto da quando era di lunedì)
       sotto ogni persona, un messaggio secondo la combinazione delle sue risposte
    4. pagina di ringraziamento con i simboli di Lerici
    ========================================================= */
@@ -169,8 +170,8 @@
     previous: null,   // risposte già date
     ans: [],          // per persona: { sun: true/false/null, mon: true/false/null }
     // accompagnatore (+1), solo per gli inviti con una persona:
-    // where "sun" = segnato nella Parte 1 → viene domenica; lunedì risponde con la sua riga (mon)
-    // where "mon" = segnato solo nella Parte 2 → viene solo lunedì
+    // where "sun" = segnato nella Parte 1 → viene domenica; per il civile risponde con la sua riga (mon)
+    // where "mon" = segnato solo nella Parte 2 → viene solo al civile
     plus: { where: null, name: "", mon: null },
     step: "code"      // "code" | "part1" | "part2" | "thanks"
   };
@@ -283,7 +284,7 @@
   function buildAllRows() {
     buildRows("rows-sun", "sun");
     buildRows("rows-mon", "mon");
-    // il +1 segnato domenica risponde per lunedì con la sua riga
+    // il +1 segnato domenica risponde per il civile con la sua riga
     if (state.plus.where === "sun") {
       $("rows-mon").appendChild(makeRow("mon", state.ans.length, plusName(),
         function () { return state.plus.mon; },
@@ -361,7 +362,7 @@
   ["sun", "mon"].forEach(function (part) {
     $("plus-on-" + part).addEventListener("change", function () {
       if (this.checked) {
-        // segnato domenica: viene domenica; se era già segnato per lunedì, resta sì anche lunedì
+        // segnato domenica: viene domenica; se era già segnato per il civile, resta sì anche al civile
         state.plus.mon = part === "sun" ? (state.plus.where === "mon" ? true : null) : true;
         state.plus.where = part;
       } else {
@@ -517,7 +518,7 @@
     // con il +1 segnato domenica, la domanda sul civile passa al plurale
     $("q2").textContent = t("q2", n + (state.plus.where === "sun" ? 1 : 0));
 
-    // nome del +1 nella sua riga del lunedì, aggiornato se lo si cambia
+    // nome del +1 nella sua riga del civile, aggiornato se lo si cambia
     var plusLabel = $("mon-name-" + state.ans.length);
     if (plusLabel) plusLabel.textContent = plusName();
 
@@ -525,7 +526,7 @@
     state.ans.forEach(function (a, i) {
       // Parte 1: sì → "Evviva!", no → "Perché?? 🤌🏼"
       showFeedback($("sun-fb-" + i), a.sun === null ? null : a.sun ? "sunYes" : "sunNo");
-      // Parte 2: combinazione di domenica e lunedì (come nel modulo Tally)
+      // Parte 2: combinazione di domenica e civile (come nel modulo Tally)
       var monKey = null;
       if (civil && a.mon !== null && a.sun !== null) {
         monKey = a.sun && a.mon ? "msgBoth" : a.sun ? "msgSundayOnly" : a.mon ? "msgMondayOnly" : "msgNone";
