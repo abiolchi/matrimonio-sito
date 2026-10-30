@@ -111,6 +111,12 @@ html { scroll-padding-top: 88px; }
 .std-thanks { text-align: center; display: flex; flex-direction: column; align-items: center; gap: 16px; padding: 24px 0 0; }
 .std-thanks h2:focus { outline: none; }
 .std-thanks p { margin: 0; max-width: 420px; overflow-wrap: anywhere; }
+/* la mail di conferma e lo spam: in evidenza, come un post-it giallo */
+.std-thanks .mail-hint {
+  max-width: none; align-self: stretch; text-align: left;
+  background: #fdf3cf; border-left: 3px solid var(--lemon); border-radius: 4px;
+  padding: 12px 14px; font-size: 15px; line-height: 1.5;
+}
 
 .summary {
   align-self: stretch; text-align: left;

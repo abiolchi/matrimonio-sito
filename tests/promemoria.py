@@ -42,6 +42,8 @@ def reminders(files):
             "**Prima** provate il nuovo codice su una **copia del foglio** (File → Crea una copia, con il suo deployment di prova), "
             "non sul foglio vero.",
             "Nel foglio vero: **Estensioni → Apps Script**, cancellate tutto, incollate il nuovo `apps-script/Code.gs`, salvate (⌘S).",
+            "Se Google chiede permessi nuovi (per esempio per mandare mail), date il permesso lanciando una voce del menu "
+            "💍 Matrimonio (le mail: **Mandami le mail di conferma di prova**) **prima** di pubblicare la nuova versione.",
             DEPLOY_NEW_VERSION,
             "Ricaricate la pagina del foglio: il menu 💍 Matrimonio si aggiorna solo così. Se sono cambiate schede, colonne "
             "o il Riepilogo, lanciate **💍 Matrimonio → Prepara il foglio** (non tocca invitati e risposte).",

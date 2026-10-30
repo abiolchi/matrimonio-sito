@@ -9,7 +9,7 @@ Lo stile è "Limoni": crema, blu mare, accento giallo limone, font Cormorant Gar
 
 ## Per ora: pagina "Save the date"
 
-Al momento `index.html` è una pagina **save the date** che raccoglie i contatti, un modulo per invito (singolo, coppia o famiglia): nomi, email, cellulare WhatsApp e, facoltativi, una seconda email e un secondo cellulare per l'altra persona della coppia. I contatti finiscono nella scheda **Contatti** del Google Sheet.
+Al momento `index.html` è una pagina **save the date** che raccoglie i contatti, un modulo per invito (singolo, coppia o famiglia): nomi, email, cellulare WhatsApp e, facoltativi, una seconda email e un secondo cellulare per l'altra persona della coppia. I contatti finiscono nella scheda **Contatti** del Google Sheet, e lo script manda subito una **mail di conferma** (dal Gmail di Alice, con Max in copia; dettagli in `apps-script/GUIDA.md`, «Mail di conferma»).
 Dopo l'invio i dati restano anche nel browser dell'ospite: tornando sulla pagina dallo stesso dispositivo vede cosa ha salvato e può correggerlo.
 Il sito completo (programma, viaggio, RSVP) è in `sito-completo.html`, uguale a prima salvo il civile spostato a sabato 18/9 e il nuovo acquerello di Villa Marigola: non ha link dalla nuova pagina, ma chi conosce l'indirizzo può ancora aprirlo.
 
@@ -101,9 +101,9 @@ A ogni Pull Request verso `main`, GitHub lancia **«Controllo del sito»** (`.gi
 - save the date e sito completo in tre lingue, su desktop e su telefono: nessun errore JavaScript, nessun testo vuoto, immagini caricate, niente scroll orizzontale;
 - il modulo dei contatti (numeri di prova di vari paesi, errori, invio, riepilogo alla visita successiva);
 - l'RSVP del sito completo con un invitato finto;
-- che `apps-script/Code.gs` non abbia errori di sintassi, e «Controlla i contatti» sui casi tipici.
+- che `apps-script/Code.gs` non abbia errori di sintassi, «Controlla i contatti» sui casi tipici e le mail di conferma (a chi partono, Max in copia, limite di Gmail, menu delle mail mancanti).
 
-La rete verso Google è finta: **nessun dato arriva al foglio vero**. Spunta verde = si può unire; rossa = nella pagina della Pull Request, **Checks → Controllo del sito**, c'è l'elenco con ✗ di cosa non va.
+La rete verso Google è finta: **nessun dato arriva al foglio vero** e **nessuna mail parte davvero**. Spunta verde = si può unire; rossa = nella pagina della Pull Request, **Checks → Controllo del sito**, c'è l'elenco con ✗ di cosa non va.
 
 **Per rendere il controllo obbligatorio prima del merge** (una volta sola, su GitHub):
 1. **Settings → Branches → Add branch ruleset** (o *Add classic branch protection rule*), per il branch `main`.
@@ -161,7 +161,7 @@ Il vecchio indirizzo `abiolchi.github.io/matrimonio-sito/` porta da solo al domi
 
 ## Da completare
 
-- [ ] Incollare il nuovo `Code.gs` e pubblicare una **nuova versione** del deployment (serve per salvare i contatti della save the date)
+- [ ] Incollare il nuovo `Code.gs`, dare il permesso per le mail (menu **Mandami le mail di conferma di prova**) e pubblicare una **nuova versione** del deployment
 - [ ] Al momento dell'RSVP: tornare al sito completo (vedi sopra), collegare contatti e inviti con **💍 Matrimonio → Controlla i contatti** (`apps-script/GUIDA.md`) e mandare a ogni contatto il suo link personale
 - [ ] Collegare il Google Sheet (`apps-script/GUIDA.md`) e inserire la lista invitati vera
 - [ ] Data limite RSVP: `[DATA]` / `[DATE]` in i18n.js (chiave `rsvpSub`) e `RSVP_DEADLINE` in Code.gs

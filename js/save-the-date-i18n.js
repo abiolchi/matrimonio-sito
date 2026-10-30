@@ -74,6 +74,7 @@ window.STD_TRANSLATIONS = {
     /* Grazie / contatti già salvati */
     thanksTitle: "Grazie, {name}!",
     thanksBody: "Abbiamo salvato i vostri contatti. Più avanti vi scriveremo a {email} con il link per confermare la presenza.",
+    mailHint: "Vi abbiamo mandato una mail di conferma. Non la trovate? Guardate nello spam o nelle promozioni e segnatela come «Non è spam»: così vi arriverà anche l'invito.",
     savedTitle: "Bentornati!",
     savedBody: "Da questo dispositivo ci avete già lasciato i vostri contatti, il {date}.",
     summaryIntro: "Ecco cosa abbiamo salvato:",
@@ -147,6 +148,7 @@ window.STD_TRANSLATIONS = {
 
     thanksTitle: "Merci, {name} !",
     thanksBody: "Nous avons bien enregistré vos coordonnées. Plus tard, nous vous écrirons à {email} avec le lien pour confirmer votre présence.",
+    mailHint: "Nous vous avons envoyé un e-mail de confirmation. Vous ne le trouvez pas ? Regardez dans les spams ou les promotions et marquez-le comme « Non spam » : ainsi, vous recevrez aussi l'invitation.",
     savedTitle: "Rebonjour !",
     savedBody: "Depuis cet appareil, vous nous avez déjà laissé vos coordonnées le {date}.",
     summaryIntro: "Voici ce que nous avons enregistré :",
@@ -219,6 +221,7 @@ window.STD_TRANSLATIONS = {
 
     thanksTitle: "Thank you, {name}!",
     thanksBody: "We've saved your details. Later on we'll write to {email} with the link to RSVP.",
+    mailHint: "We've sent you a confirmation email. Can't find it? Check your spam or promotions folder and mark it as \"Not spam\": that way the invitation will reach you too.",
     savedTitle: "Welcome back!",
     savedBody: "You already left us your details from this device on {date}.",
     summaryIntro: "Here's what we saved:",

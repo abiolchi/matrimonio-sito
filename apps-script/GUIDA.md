@@ -90,6 +90,7 @@ Finché il sito mostra la pagina save the date, ogni invito (singolo, coppia o f
 |---|---|
 | Data, Nomi, Email, Email 2, Cellulare (WhatsApp), Cellulare 2, Lingua | lo script |
 | Codice invito, Note (private) | **voi**: lo script non le tocca mai |
+| Mail di conferma | lo script: `✓` e gli indirizzi a cui è partita, oppure `⏳ da inviare` |
 
 - I numeri sono già in formato internazionale, per esempio `+32470123456`.
 - Se la scheda Contatti era stata creata prima che esistesse «Email 2», lo script inserisce da solo la colonna dopo «Email» al primo invio (o con **Prepara il foglio**): i dati già presenti si spostano a destra insieme alle loro colonne.
@@ -101,6 +102,20 @@ Finché il sito mostra la pagina save the date, ogni invito (singolo, coppia o f
 - Protezione: al massimo 150 invii ogni 10 minuti in tutto. Oltre, il sito chiede di riprovare più tardi.
 
 Se il foglio esisteva già prima della save the date, dopo aver incollato il nuovo codice lancia di nuovo **💍 Matrimonio → Prepara il foglio**: aggiunge la scheda Contatti e la riga nel Riepilogo senza toccare invitati e risposte.
+
+### Mail di conferma
+
+Appena un invito lascia i contatti, lo script gli manda una mail di conferma nella lingua scelta sul sito: il riepilogo di cosa ha scritto, la data, che non è ancora l'RSVP, il consiglio di salvare il vostro indirizzo e di segnare la mail come «Non è spam», e il link al sito per correggere.
+
+- **Mittente:** il Gmail di chi ha pubblicato lo script (Alice), con nome «Alice & Max». **Max è sempre in copia** (`CONFIRM_CC` in cima a `Code.gs`). Se qualcuno risponde, la risposta arriva ad Alice.
+- **Destinatari:** l'email principale e la seconda email, se c'è.
+- **Una volta sola per indirizzo:** se l'ospite corregge solo il nome o il cellulare, non parte niente. Se cambia l'email, la mail parte solo al nuovo indirizzo.
+- **Limite di Gmail:** circa **100 destinatari al giorno**, e la copia a Max conta. Ogni conferma quindi ne usa 2 (3 con la seconda email): circa 30–50 conferme al giorno. Quando il limite è finito, il contatto viene salvato lo stesso, e la colonna «Mail di conferma» dice `⏳ da inviare`.
+- **Le mail rimaste:** **💍 Matrimonio → Invia le mail di conferma mancanti** manda tutte quelle con ⏳ (o mai partite), finché il limite lo permette. Si può rilanciare quante volte serve: non manda mai due volte la stessa. Nel **Riepilogo** c'è la riga "Mail di conferma da inviare".
+- **Errori:** se Gmail dà un errore, il contatto è salvato comunque, la cella resta ⏳ e il motivo finisce nello **Storico** ("Mail di conferma non partita").
+- **Vederla prima:** **💍 Matrimonio → Mandami le mail di conferma di prova** manda a voi le tre versioni (italiano, francese, inglese), senza Max in copia e senza aggiungere righe ai Contatti.
+
+**La prima volta** che si usano le mail, Google chiede un permesso nuovo («Inviare email per tuo conto»). Per darlo, dopo aver incollato il codice, lancia **Mandami le mail di conferma di prova** dal menu e accetta (se compare «Google non ha verificato questa app»: **Avanzate → Vai a … (non sicura)**, è il tuo script). Solo dopo pubblica la **nuova versione** del deployment. Finché il permesso manca, i contatti si salvano lo stesso ma le mail restano ⏳: le mandi poi con **Invia le mail di conferma mancanti**.
 
 ## Collegare i contatti agli inviti (prima di mandare gli RSVP)
 
@@ -135,6 +150,7 @@ Lo script **non cancella e non unisce mai** righe, e **non cambia mai** un codic
 In cima a `Code.gs`:
 
 - `RSVP_DEADLINE = '2027-06-30'` chiude le risposte dopo quella data. Vuoto vuol dire sempre aperto.
+- `CONFIRM_CC` è l'indirizzo sempre in copia nelle mail di conferma (Max). `SITE_URL` è il sito citato nella mail.
 - `MAX_FAILED_ATTEMPTS` imposta dopo quanti codici sbagliati in 10 minuti il modulo si blocca per qualche minuto, come protezione da chi prova codici a caso.
 
 **Dopo ogni modifica a `Code.gs`** bisogna pubblicare una nuova versione, altrimenti il sito continua a usare quella vecchia: **Esegui il deployment → Gestisci deployment → ✏️ → Versione: Nuova versione → Esegui il deployment**. L'URL resta lo stesso.

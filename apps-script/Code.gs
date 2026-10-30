@@ -21,14 +21,23 @@ var SHEET_LOG = 'Storico';
 var SHEET_SUMMARY = 'Riepilogo';
 
 // Save the date: scheda dei contatti (sempre la prima del file).
-// Le ultime due colonne sono vostre: lo script non le scrive mai.
+// "Codice invito" e "Note (private)" sono vostre: lo script non le scrive mai.
 var SHEET_CONTACTS = 'Contatti';
 // Una riga per invito (singolo, coppia o famiglia).
-var CONTACT_HEADERS = ['Data', 'Nomi', 'Email', 'Email 2', 'Cellulare (WhatsApp)', 'Cellulare 2', 'Lingua', 'Codice invito', 'Note (private)'];
+var CONTACT_HEADERS = ['Data', 'Nomi', 'Email', 'Email 2', 'Cellulare (WhatsApp)', 'Cellulare 2', 'Lingua', 'Codice invito', 'Note (private)', 'Mail di conferma'];
 var CONTACT_SCRIPT_COLUMNS = 7; // da "Data" a "Lingua"
+var CONFIRM_COLUMN = 10;        // J, "Mail di conferma": a chi è partita (✓) o ⏳ se manca ancora
 // Protezione: al massimo tanti invii di contatti ogni 10 minuti, in tutto.
 var MAX_CONTACTS_PER_WINDOW = 150;
 var CONTACT_WINDOW_SECONDS = 600;
+
+// Mail di conferma della save the date: parte dal Gmail di chi ha pubblicato lo script,
+// con Max sempre in copia. Gmail permette circa 100 destinatari al giorno, e la copia conta:
+// quelle che non partono restano "⏳" e si mandano con 💍 Matrimonio → Invia le mail di conferma mancanti.
+var CONFIRM_SENDER_NAME = 'Alice & Max';
+var CONFIRM_CC = 'maxence.draguet@gmail.com';
+var CONFIRM_PENDING = '⏳ da inviare';
+var SITE_URL = 'https://alicemaxlerici.it';
 
 var GUEST_HEADERS =['Codice', 'Nomi (separati da ;)', 'Lingua (it / fr / en)', 'Invitati al civile (sì / no)', 'Note (private)'];
 // Nel codice "monday" vuol dire il matrimonio civile (nome rimasto da quando era di lunedì: ora è sabato 18/9).
@@ -59,6 +68,8 @@ function onOpen() {
     .addItem('Prepara il foglio (solo la prima volta)', 'setupSheets')
     .addItem('Genera i codici mancanti', 'generateMissingCodes')
     .addItem('Controlla i contatti', 'checkContacts')
+    .addItem('Invia le mail di conferma mancanti', 'sendMissingConfirmations')
+    .addItem('Mandami le mail di conferma di prova', 'sendTestConfirmations')
     .addToUi();
 }
 
@@ -88,7 +99,8 @@ function setupSheets() {
     ['Sabato (civile) – ci saranno', '=COUNTIF(Risposte!E2:E;"Sì")'],
     ['Sabato (civile) – non ci saranno', '=COUNTIF(Risposte!E2:E;"No")'],
     ['Accompagnatori (+1)', '=COUNTIF(Risposte!G2:G;"Sì")'],
-    ['Contatti ricevuti (save the date)', '=COUNTA(Contatti!C2:C)']
+    ['Contatti ricevuti (save the date)', '=COUNTA(Contatti!C2:C)'],
+    ['Mail di conferma da inviare', '=COUNTIF(Contatti!J2:J;"*⏳*")']
   ];
   // Formule col ";" come separatore, perché il foglio è in italiano.
   // Se un giorno il foglio passa a una lingua con la virgola (es. inglese), vanno cambiati in ",".
@@ -267,6 +279,7 @@ function saveContact_(data) {
 
   var lang = LANGS.indexOf(data.lang) > -1 ? data.lang : 'it';
   var now = new Date();
+  var mail;
   var values = [
     now,
     safeText_(name),
@@ -303,10 +316,12 @@ function saveContact_(data) {
       now, '', row ? 'Contatti aggiornati' : 'Nuovi contatti',
       safeText_(JSON.stringify({ name: name, email: email, email2: email2, phones: phones, lang: lang }))
     ]);
+    // mail di conferma solo agli indirizzi nuovi: chi cambia solo il cellulare non la riceve di nuovo
+    mail = confirmContact_(sheet, row || last + 1, { name: name, email: email, email2: email2, phones: phones, lang: lang }, log);
   } finally {
     lock.releaseLock();
   }
-  return { ok: true };
+  return { ok: true, mail: mail };
 }
 
 // La scheda "Contatti", creata se manca e sempre spostata al primo posto
@@ -318,13 +333,18 @@ function getOrCreateContactsSheet_(ss) {
     sheet.setFrozenRows(1);
     sheet.setColumnWidth(1, 150).setColumnWidth(2, 200).setColumnWidth(3, 240).setColumnWidth(4, 240)
       .setColumnWidth(5, 170).setColumnWidth(6, 150)
-      .setColumnWidth(8, 130).setColumnWidth(9, 240);
+      .setColumnWidth(8, 130).setColumnWidth(9, 240).setColumnWidth(CONFIRM_COLUMN, 300);
   } else if (String(sheet.getRange(1, 4).getValue()) === 'Cellulare (WhatsApp)') {
     // scheda creata con la versione senza "Email 2": inserisce la colonna dopo "Email",
     // così i dati già presenti (e le vostre colonne) si spostano a destra senza mescolarsi
     sheet.insertColumnAfter(3);
     sheet.getRange(1, 4).setValue('Email 2').setFontWeight('bold');
     sheet.setColumnWidth(4, 240);
+  }
+  if (String(sheet.getRange(1, CONFIRM_COLUMN).getValue()) === '') {
+    // scheda creata prima delle mail di conferma
+    sheet.getRange(1, CONFIRM_COLUMN).setValue(CONTACT_HEADERS[CONFIRM_COLUMN - 1]).setFontWeight('bold');
+    sheet.setColumnWidth(CONFIRM_COLUMN, 300);
   }
   if (sheet.getIndex() !== 1) {
     var active = ss.getActiveSheet();
@@ -342,6 +362,173 @@ function contactLimitReached_() {
   if (n >= MAX_CONTACTS_PER_WINDOW) return true;
   cache.put('contacts', String(n + 1), CONTACT_WINDOW_SECONDS);
   return false;
+}
+
+
+
+/* ---------- Save the date: mail di conferma ---------- */
+
+// Testi della mail, nella lingua scelta sul sito. {name} = i nomi scritti nel modulo.
+var CONFIRM_TEXTS = {
+  it: {
+    subject: 'Alice & Max · Abbiamo ricevuto i vostri contatti',
+    hello: 'Ciao {name},',
+    intro: 'grazie! Abbiamo ricevuto i vostri contatti:',
+    names: 'Nomi', email: 'Email', phones: 'Cellulari',
+    date: 'Segnatevi la data: sabato 18 e domenica 19 settembre 2027, a Lerici (Golfo dei Poeti).',
+    notRsvp: 'Questa mail non conferma la vostra presenza: nei prossimi mesi riceverete un invito personalizzato a questo indirizzo.',
+    spam: 'Per essere sicuri di riceverlo, aggiungete questo indirizzo ai vostri contatti. Se avete trovato questa mail nello spam o nelle promozioni, segnatela come «Non è spam» o spostatela nella posta in arrivo.',
+    fix: 'Qualcosa non va? Potete correggere i dati dal sito, dallo stesso dispositivo, oppure rispondere a questa mail:',
+    bye: 'A presto!'
+  },
+  fr: {
+    subject: 'Alice & Max · Nous avons bien reçu vos coordonnées',
+    hello: 'Bonjour {name},',
+    intro: 'merci ! Nous avons bien reçu vos coordonnées :',
+    names: 'Noms', email: 'E-mail', phones: 'Portables',
+    date: 'Notez la date : samedi 18 et dimanche 19 septembre 2027, à Lerici (Golfe des Poètes).',
+    notRsvp: 'Cet e-mail ne confirme pas votre présence : dans les prochains mois, vous recevrez une invitation personnalisée à cette adresse.',
+    spam: 'Pour être sûrs de la recevoir, ajoutez cette adresse à vos contacts. Si vous avez trouvé cet e-mail dans les spams ou les promotions, marquez-le comme « Non spam » ou déplacez-le dans votre boîte de réception.',
+    fix: 'Quelque chose ne va pas ? Vous pouvez corriger vos données sur le site, depuis le même appareil, ou répondre à cet e-mail :',
+    bye: 'À bientôt !'
+  },
+  en: {
+    subject: "Alice & Max · We've received your details",
+    hello: 'Hi {name},',
+    intro: "thank you! We've received your details:",
+    names: 'Names', email: 'Email', phones: 'Mobiles',
+    date: 'Save the date: Saturday 18 and Sunday 19 September 2027, in Lerici (Gulf of Poets).',
+    notRsvp: "This email doesn't confirm your attendance: in the coming months you'll receive a personal invitation at this address.",
+    spam: "To make sure you get it, add this address to your contacts. If you found this email in spam or promotions, mark it as \"Not spam\" or move it to your inbox.",
+    fix: 'Something not right? You can correct your details on the website, from the same device, or just reply to this email:',
+    bye: 'See you soon!'
+  }
+};
+
+// Manda la mail di conferma agli indirizzi del contatto che non l'hanno ancora ricevuta e scrive
+// nella colonna "Mail di conferma" a chi è partita. Non lancia mai errori: se Gmail non può
+// (limite giornaliero o altro), la cella dice "⏳ da inviare" e ci pensa il menu.
+// Restituisce 'sent', 'pending' o 'none' (niente da mandare).
+function confirmContact_(sheet, row, contact, log) {
+  var cell = sheet.getRange(row, CONFIRM_COLUMN);
+  var before = String(cell.getValue());
+  var already = confirmedEmails_(before);
+  var current = [contact.email, contact.email2].filter(String);
+  var done = current.filter(function (e) { return already.indexOf(e.toLowerCase()) > -1; });
+  var missing = current.filter(function (e) { return already.indexOf(e.toLowerCase()) === -1; });
+
+  var result = 'none';
+  if (missing.length) {
+    result = 'pending';
+    var cc = missing.some(function (e) { return e.toLowerCase() === CONFIRM_CC; }) ? '' : CONFIRM_CC;
+    try {
+      // la copia a Max conta nel limite giornaliero
+      if (MailApp.getRemainingDailyQuota() >= missing.length + (cc ? 1 : 0)) {
+        MailApp.sendEmail(confirmMessage_(missing, cc, contact));
+        done = done.concat(missing);
+        result = 'sent';
+        if (log) log.appendRow([new Date(), '', 'Mail di conferma', safeText_(missing.join(', '))]);
+      } else if (log) {
+        log.appendRow([new Date(), '', 'Mail di conferma rimandata', 'Limite giornaliero di Gmail: ' + safeText_(missing.join(', '))]);
+      }
+    } catch (err) {
+      if (log) log.appendRow([new Date(), '', 'Mail di conferma non partita', safeText_(missing.join(', ') + ' – ' + err)]);
+    }
+  }
+  // nell'ordine del modulo: prima l'email principale
+  done = current.filter(function (e) { return done.indexOf(e) > -1; });
+  var text = (done.length ? '✓ ' + done.join(', ') : '') + (result === 'pending' ? (done.length ? ' · ' : '') + CONFIRM_PENDING : '');
+  if (text !== before) cell.setValue(safeText_(text));
+  return result;
+}
+
+// Gli indirizzi che hanno già ricevuto la mail, letti dalla cella "Mail di conferma"
+function confirmedEmails_(text) {
+  var sent = String(text || '').split('⏳')[0];
+  return (sent.match(/[^\s,·✓']+@[^\s,·]+/g) || []).map(function (e) { return e.toLowerCase(); });
+}
+
+// La mail, in testo semplice e in HTML (i dati degli ospiti sempre "escaped")
+function confirmMessage_(to, cc, contact) {
+  var T = CONFIRM_TEXTS[contact.lang] || CONFIRM_TEXTS.it;
+  var emails = [contact.email, contact.email2].filter(String).join(', ');
+  var phones = contact.phones.join(', ');
+  var hello = T.hello.replace('{name}', contact.name);
+
+  var body = [
+    hello, '', T.intro, '',
+    T.names + ': ' + contact.name, T.email + ': ' + emails, T.phones + ': ' + phones, '',
+    T.date, '', T.notRsvp, '', T.spam, '', T.fix, SITE_URL, '', T.bye, 'Alice & Max'
+  ].join('\n');
+
+  var p = function (s) { return '<p style="margin:0 0 14px">' + s + '</p>'; };
+  var html = '<div style="font-family:Georgia,serif;font-size:16px;line-height:1.5;color:#1f3a5f;max-width:560px">' +
+    p(escapeHtml_(hello)) + p(escapeHtml_(T.intro)) +
+    '<table style="margin:0 0 14px;border-collapse:collapse">' +
+    [[T.names, contact.name], [T.email, emails], [T.phones, phones]].map(function (r) {
+      return '<tr><td style="padding:2px 16px 2px 0;color:#5b6b80">' + escapeHtml_(r[0]) + '</td><td style="color:#1f3a5f">' + escapeHtml_(r[1]) + '</td></tr>';
+    }).join('') + '</table>' +
+    p('<strong>' + escapeHtml_(T.date) + '</strong>') + p(escapeHtml_(T.notRsvp)) + p(escapeHtml_(T.spam)) +
+    p(escapeHtml_(T.fix) + ' <a href="' + SITE_URL + '">' + SITE_URL.replace('https://', '') + '</a>') +
+    p(escapeHtml_(T.bye) + '<br>Alice &amp; Max') + '</div>';
+
+  var message = { to: to.join(','), name: CONFIRM_SENDER_NAME, subject: T.subject, body: body, htmlBody: html };
+  if (cc) message.cc = cc;
+  return message;
+}
+
+function escapeHtml_(s) {
+  return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+// Menu: manda le mail di conferma che mancano (righe con ⏳ o senza niente nella colonna J),
+// finché il limite giornaliero di Gmail lo permette
+function sendMissingConfirmations() {
+  var message;
+  var lock = LockService.getScriptLock();
+  lock.waitLock(20000);
+  try {
+    message = runMissingConfirmations_(SpreadsheetApp.getActive());
+  } finally {
+    lock.releaseLock();
+  }
+  SpreadsheetApp.getUi().alert(message);
+}
+
+function runMissingConfirmations_(ss) {
+  var sheet = getOrCreateContactsSheet_(ss);
+  var log = ss.getSheetByName(SHEET_LOG) || getOrCreateSheet_(ss, SHEET_LOG, LOG_HEADERS);
+  var count = lastDataRow_(sheet, CONTACT_SCRIPT_COLUMNS) - 1;
+  var rows = count > 0 ? sheet.getRange(2, 1, count, CONTACT_SCRIPT_COLUMNS).getValues() : [];
+  var sent = 0, pending = 0;
+  rows.forEach(function (r, i) {
+    var clean = function (v) { return String(v).replace(/^'/, '').trim(); };
+    var email = clean(r[2]);
+    if (!email) return;
+    var lang = clean(r[6]);
+    var result = confirmContact_(sheet, i + 2, {
+      name: clean(r[1]), email: email, email2: clean(r[3]),
+      phones: [clean(r[4]), clean(r[5])].filter(String), lang: LANGS.indexOf(lang) > -1 ? lang : 'it'
+    }, log);
+    if (result === 'sent') sent++;
+    if (result === 'pending') pending++;
+  });
+  return (sent ? 'Mandate ' + sent + ' mail di conferma.' : 'Nessuna mail di conferma da mandare.') +
+    (pending ? '\n\n⏳ Ne restano ' + pending + ': Gmail ha raggiunto il limite di oggi (o c\'è stato un errore, vedi lo Storico). ' +
+      'Riprovate domani con lo stesso menu.' : '');
+}
+
+// Menu: manda a voi (a chi ha pubblicato lo script) la mail di conferma nelle tre lingue,
+// senza Max in copia, per vedere come arriva. Serve anche a dare a Google il permesso di mandare mail.
+function sendTestConfirmations() {
+  var me = Session.getEffectiveUser().getEmail();
+  LANGS.forEach(function (lang) {
+    MailApp.sendEmail(confirmMessage_([me], '', {
+      name: 'Vanessa e Marco Rossi', email: me, email2: '', phones: ['+393331234567'], lang: lang
+    }));
+  });
+  SpreadsheetApp.getUi().alert('Mandate 3 mail di prova (italiano, francese, inglese) a ' + me + '.\n\n' +
+    'Nessuna riga è stata aggiunta ai Contatti.');
 }
 
 
