@@ -91,13 +91,15 @@ Finché il sito mostra la pagina save the date, ogni invito (singolo, coppia o f
 | Data, Nomi, Email, Email 2, Cellulare (WhatsApp), Cellulare 2, Lingua | lo script |
 | Codice invito, Note (private) | **voi**: lo script non le tocca mai |
 | Mail di conferma | lo script: `✓` e gli indirizzi a cui è partita, oppure `⏳ da inviare` |
+| Via e numero, Scala / interno, CAP, Città, Paese | lo script: l'indirizzo di casa, **facoltativo** (vuote se non l'hanno dato) |
 
 - I numeri sono già in formato internazionale, per esempio `+32470123456`.
+- **Indirizzo di casa** (facoltativo, uno per invito): chi lo comincia deve scrivere via, CAP e città. Il sito controlla il formato del CAP per il paese scelto (Europa e Regno Unito; in Irlanda il CAP può mancare). Il CAP è salvato come testo, così `00184` non perde gli zeri; il paese è scritto in italiano. L'indirizzo compare anche nel riepilogo sul sito e nella mail di conferma, così l'ospite può accorgersi di un errore. Se l'ospite rimanda il modulo senza indirizzo, le colonne si svuotano.
 - Se la scheda Contatti era stata creata prima che esistesse «Email 2», lo script inserisce da solo la colonna dopo «Email» al primo invio (o con **Prepara il foglio**): i dati già presenti si spostano a destra insieme alle loro colonne.
 - Se qualcuno rimanda il modulo con **la stessa email principale**, la sua riga viene aggiornata (Codice invito e Note restano come li avete scritti).
 - Il sito ricorda i dati mandati **su quel dispositivo**: tornando sulla pagina, l'ospite vede cosa ha salvato e può correggerlo. Se corregge anche l'email, viene aggiornata la stessa riga invece di crearne una nuova. Da un altro telefono o computer il modulo riparte vuoto, e con un'email diversa arriva una riga nuova.
 - Ogni invio finisce anche nello **Storico** ("Nuovi contatti" o "Contatti aggiornati").
-- Nel **Riepilogo** c'è la riga "Contatti ricevuti (save the date)".
+- Nel **Riepilogo** ci sono le righe "Contatti ricevuti (save the date)" e "Indirizzi di casa ricevuti".
 - Se la scheda Contatti manca, lo script la ricrea da solo al primo invio.
 - Protezione: al massimo 150 invii ogni 10 minuti in tutto. Oltre, il sito chiede di riprovare più tardi.
 

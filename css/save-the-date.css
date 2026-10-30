@@ -102,6 +102,15 @@ html { scroll-padding-top: 88px; }
 }
 .field input[aria-invalid="true"] { border-color: var(--error); }
 
+/* indirizzo: CAP stretto e città sulla stessa riga; il paese come gli altri menu */
+.addr-row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); gap: 12px; }
+.country {
+  min-height: 48px; padding: 0 10px; width: 100%;
+  border: 1px solid var(--field); border-radius: 4px;
+  background: #fff; color: var(--navy); font: inherit; font-size: 16px; cursor: pointer;
+}
+.country:focus { outline: 2px solid var(--navy); outline-offset: 1px; }
+
 .std-actions { display: flex; flex-wrap: wrap; gap: 12px; }
 .std-actions .btn { flex: 1 1 160px; }
 #send-error { text-align: center; }
