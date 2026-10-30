@@ -86,6 +86,12 @@ def static_checks():
     check(cname == SITE_DOMAIN, f"CNAME contiene {SITE_DOMAIN}" + ("" if cname == SITE_DOMAIN else
           " (il file manca: GitHub Pages smetterebbe di usare il dominio)" if cname is None else f" (c'è «{cname}»)"))
 
+    section("Paesi dell'indirizzo")
+    site = set(re.findall(r"\b([A-Z]{2}): /", re.search(r"var ZIP_FORMATS = \{(.*?)\};", (ROOT / "js/save-the-date.js").read_text(encoding="utf-8"), re.S).group(1)))
+    script = set(re.findall(r"\b([A-Z]{2}): '", re.search(r"var COUNTRY_NAMES_IT = \{(.*?)\};", (ROOT / "apps-script/Code.gs").read_text(encoding="utf-8"), re.S).group(1)))
+    check(site == script and "GB" in site and "IT" in site, f"sito e script accettano gli stessi {len(site)} paesi" +
+          ("" if site == script else f" (solo nel sito: {sorted(site - script)}, solo nello script: {sorted(script - site)})"))
+
     section("File citati")
     for name, (page, _) in PAGES.items():
         refs = Refs()
@@ -263,6 +269,40 @@ def form_checks(browser):
     page.fill("#phone1", "")
     page.select_option("#cc1", "IT")
     page.fill("#phone1", "333 1234567")
+
+    homes = {}
+    for lang in LANGS:
+        page.click(f'.langs [data-lang="{lang}"]')
+        homes[lang] = page.input_value("#country")
+    page.click('.langs [data-lang="it"]')
+    check(homes == {"it": "IT", "fr": "BE", "en": "GB"}, "paese iniziale dell'indirizzo secondo la lingua" + ("" if homes["fr"] == "BE" else f" ({homes})"))
+    check(page.locator("#country option").count() >= 30, "menu dei paesi: Europa e Regno Unito")
+
+    page.fill("#zip", "19032")
+    sent.clear()
+    page.click("#send-btn")
+    check(not sent and page.is_visible("#street-error") and page.is_visible("#city-error"),
+          "indirizzo cominciato a metà: chiede via e città, niente invio")
+    page.fill("#street", "Via dei Limoni 1")
+    page.fill("#city", "Lerici")
+    page.fill("#zip", "1903")
+    page.click("#send-btn")
+    check(not sent and page.is_visible("#zip-error"), "CAP italiano di 4 cifre: errore")
+    page.select_option("#country", "BE")
+    check(not page.is_visible("#zip-error"), "cambiando paese in Belgio, lo stesso CAP va bene")
+    page.select_option("#country", "GB")
+    page.fill("#zip", "sw1a  1aa")
+    page.click("#send-btn")
+    page.wait_for_selector("#std-thanks:not([hidden])")
+    addr = sent[-1].get("address") if sent else None
+    check(addr == {"street": "Via dei Limoni 1", "street2": "", "zip": "SW1A 1AA", "city": "Lerici", "country": "GB"},
+          "indirizzo inviato pulito (CAP in maiuscolo)" + ("" if addr and addr.get("zip") == "SW1A 1AA" else f" ({addr})"))
+    check("SW1A 1AA Lerici" in page.inner_text("#sum-address"), "riepilogo: mostra l'indirizzo")
+    page.click("#edit-btn")
+    check(page.input_value("#country") == "GB" and page.input_value("#street") == "Via dei Limoni 1",
+          "«Modifica i contatti» rimette l'indirizzo")
+    for id in ("street", "zip", "city"):
+        page.fill("#" + id, "")
     page.fill("#email2", "marco@")
     sent.clear()
     page.click("#send-btn")
@@ -274,6 +314,7 @@ def form_checks(browser):
     page.click("#send-btn")
     page.wait_for_selector("#std-thanks:not([hidden])")
     payload = sent[-1] if sent else {}
+    check(payload.get("address") is None and not page.is_visible("#sum-address-row"), "senza indirizzo: niente indirizzo inviato né nel riepilogo")
     check(payload.get("action") == "contact" and payload.get("email2") == "marco@example.com"
           and payload.get("phones") == ["+393331234567", "+32470123456"] and payload.get("website") == "",
           "invio completo: dati giusti nel formato giusto")
@@ -510,6 +551,15 @@ def mail_checks(browser):
         sendMissingConfirmations();
         out.alertAgain = lastAlert;
 
+        const withAddress = send({ name: 'Anna', email: 'a@x.it', lang: 'it',
+            address: { street: 'Via Roma 1', street2: 'Scala B', zip: '00184', city: 'Roma', country: 'IT' } });
+        const aRow = C.data[C.getLastRow() - 1];
+        out.address = { ok: withAddress.ok, cols: aRow.slice(ADDRESS_COLUMN - 1, ADDRESS_COLUMN + 4), header: C.data[0][ADDRESS_COLUMN + 1],
+                        body: (mails[mails.length - 1] || {}).body || '' };
+        out.badCountry = send({ name: 'X', email: 'x@x.it', address: { street: 'A', zip: '123', city: 'B', country: 'US' } });
+        out.noZip = send({ name: 'Y', email: 'y@x.it', address: { street: 'A', zip: '', city: 'B', country: 'IT' } });
+        out.irish = send({ name: 'Z', email: 'z@x.ie', address: { street: 'A', zip: '', city: 'Dublin', country: 'IE' } });
+
         MailApp.sendEmail = () => { throw new Error('Autorizzazione richiesta'); };
         out.broken = send({ name: 'Pinco', email: 'p@x.it' });
         out.log = ss.sheets.Storico.data.map(r => r[2]).join(' | ');
@@ -536,6 +586,12 @@ def mail_checks(browser):
     check("Nessuna" in r["alertAgain"], "rilanciando il menu non parte niente due volte")
     check(r["broken"].get("ok") and r["broken"].get("mail") == "pending" and "non partita" in r["log"],
           "Gmail dà errore: il contatto è salvato, l'errore finisce nello Storico")
+    a = r["address"]
+    check(a["ok"] and a["cols"] == ["Via Roma 1", "Scala B", "'00184", "Roma", "Italia"] and a["header"] == "CAP",
+          "indirizzo nelle colonne K–O, CAP come testo (00184 resta 00184)" + ("" if a["cols"][2] == "'00184" else f" ({a['cols']})"))
+    check("Via Roma 1, Scala B, 00184 Roma, Italia" in a["body"], "la mail di conferma riporta l'indirizzo")
+    check(r["badCountry"].get("error") == "invalid" and r["noZip"].get("error") == "invalid", "paese fuori lista o CAP mancante: rifiutati")
+    check(r["irish"].get("ok"), "Irlanda: il CAP (Eircode) può mancare")
     page.close()
 
 

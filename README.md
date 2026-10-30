@@ -9,7 +9,7 @@ Lo stile è "Limoni": crema, blu mare, accento giallo limone, font Cormorant Gar
 
 ## Per ora: pagina "Save the date"
 
-Al momento `index.html` è una pagina **save the date** che raccoglie i contatti, un modulo per invito (singolo, coppia o famiglia): nomi, email, cellulare WhatsApp e, facoltativi, una seconda email e un secondo cellulare per l'altra persona della coppia. I contatti finiscono nella scheda **Contatti** del Google Sheet, e lo script manda subito una **mail di conferma** (dal Gmail di Alice, con Max in copia; dettagli in `apps-script/GUIDA.md`, «Mail di conferma»).
+Al momento `index.html` è una pagina **save the date** che raccoglie i contatti, un modulo per invito (singolo, coppia o famiglia): nomi, email, cellulare WhatsApp e, facoltativi, una seconda email e un secondo cellulare per l'altra persona della coppia, e l'indirizzo di casa. I contatti finiscono nella scheda **Contatti** del Google Sheet, e lo script manda subito una **mail di conferma** (dal Gmail di Alice, con Max in copia; dettagli in `apps-script/GUIDA.md`, «Mail di conferma»).
 Dopo l'invio i dati restano anche nel browser dell'ospite: tornando sulla pagina dallo stesso dispositivo vede cosa ha salvato e può correggerlo.
 Il sito completo (programma, viaggio, RSVP) è in `sito-completo.html`, uguale a prima salvo il civile spostato a sabato 18/9 e il nuovo acquerello di Villa Marigola: non ha link dalla nuova pagina, ma chi conosce l'indirizzo può ancora aprirlo.
 

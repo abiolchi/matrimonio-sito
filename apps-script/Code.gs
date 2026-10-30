@@ -24,9 +24,22 @@ var SHEET_SUMMARY = 'Riepilogo';
 // "Codice invito" e "Note (private)" sono vostre: lo script non le scrive mai.
 var SHEET_CONTACTS = 'Contatti';
 // Una riga per invito (singolo, coppia o famiglia).
-var CONTACT_HEADERS = ['Data', 'Nomi', 'Email', 'Email 2', 'Cellulare (WhatsApp)', 'Cellulare 2', 'Lingua', 'Codice invito', 'Note (private)', 'Mail di conferma'];
+var CONTACT_HEADERS = ['Data', 'Nomi', 'Email', 'Email 2', 'Cellulare (WhatsApp)', 'Cellulare 2', 'Lingua', 'Codice invito', 'Note (private)', 'Mail di conferma',
+  'Via e numero', 'Scala / interno', 'CAP', 'Città', 'Paese'];
 var CONTACT_SCRIPT_COLUMNS = 7; // da "Data" a "Lingua"
 var CONFIRM_COLUMN = 10;        // J, "Mail di conferma": a chi è partita (✓) o ⏳ se manca ancora
+var ADDRESS_COLUMN = 11;        // K–O, indirizzo di casa (facoltativo)
+
+// Paesi accettati per l'indirizzo (Europa + Regno Unito), con il nome scritto nel foglio.
+// I codici sono gli stessi di ZIP_FORMATS in js/save-the-date.js.
+var COUNTRY_NAMES_IT = {
+  AD: 'Andorra', AT: 'Austria', BE: 'Belgio', BG: 'Bulgaria', CH: 'Svizzera', CY: 'Cipro', CZ: 'Repubblica Ceca',
+  DE: 'Germania', DK: 'Danimarca', EE: 'Estonia', ES: 'Spagna', FI: 'Finlandia', FR: 'Francia', GB: 'Regno Unito',
+  GR: 'Grecia', HR: 'Croazia', HU: 'Ungheria', IE: 'Irlanda', IS: 'Islanda', IT: 'Italia', LI: 'Liechtenstein',
+  LT: 'Lituania', LU: 'Lussemburgo', LV: 'Lettonia', MC: 'Monaco', MT: 'Malta', NL: 'Paesi Bassi', NO: 'Norvegia',
+  PL: 'Polonia', PT: 'Portogallo', RO: 'Romania', SE: 'Svezia', SI: 'Slovenia', SK: 'Slovacchia', SM: 'San Marino',
+  VA: 'Città del Vaticano'
+};
 // Protezione: al massimo tanti invii di contatti ogni 10 minuti, in tutto.
 var MAX_CONTACTS_PER_WINDOW = 150;
 var CONTACT_WINDOW_SECONDS = 600;
@@ -100,7 +113,8 @@ function setupSheets() {
     ['Sabato (civile) – non ci saranno', '=COUNTIF(Risposte!E2:E;"No")'],
     ['Accompagnatori (+1)', '=COUNTIF(Risposte!G2:G;"Sì")'],
     ['Contatti ricevuti (save the date)', '=COUNTA(Contatti!C2:C)'],
-    ['Mail di conferma da inviare', '=COUNTIF(Contatti!J2:J;"*⏳*")']
+    ['Mail di conferma da inviare', '=COUNTIF(Contatti!J2:J;"*⏳*")'],
+    ['Indirizzi di casa ricevuti', '=COUNTA(Contatti!K2:K)']
   ];
   // Formule col ";" come separatore, perché il foglio è in italiano.
   // Se un giorno il foglio passa a una lingua con la virgola (es. inglese), vanno cambiati in ",".
@@ -277,6 +291,21 @@ function saveContact_(data) {
   }
   if (!phones.length || phones.length > 2) return { ok: false, error: 'invalid' };
 
+  // indirizzo di casa, facoltativo: se c'è, servono via, città, un paese della lista e il CAP
+  // (il formato preciso del CAP lo controlla il sito, paese per paese)
+  var address = null;
+  if (data.address) {
+    var a = data.address;
+    var clip = function (v, n) { return String(v || '').trim().slice(0, n); };
+    address = {
+      street: clip(a.street, 150), street2: clip(a.street2, 150),
+      zip: clip(a.zip, 12).toUpperCase().replace(/\s+/g, ' '), city: clip(a.city, 100),
+      country: String(a.country || '').toUpperCase()
+    };
+    if (!address.street || !address.city || !COUNTRY_NAMES_IT[address.country]) return { ok: false, error: 'invalid' };
+    if (address.zip ? !/^[A-Z0-9][A-Z0-9 \-]{1,11}$/.test(address.zip) : address.country !== 'IE') return { ok: false, error: 'invalid' };
+  }
+
   var lang = LANGS.indexOf(data.lang) > -1 ? data.lang : 'it';
   var now = new Date();
   var mail;
@@ -310,14 +339,19 @@ function saveContact_(data) {
     row = row || previousRow;
     // solo le colonne dello script: "Codice invito" e "Note (private)" restano come sono
     sheet.getRange(row || last + 1, 1, 1, CONTACT_SCRIPT_COLUMNS).setValues([values]);
+    // indirizzo: il CAP sempre come testo, altrimenti "00184" diventerebbe 184
+    sheet.getRange(row || last + 1, ADDRESS_COLUMN, 1, 5).setValues([address ? [
+      safeText_(address.street), safeText_(address.street2), address.zip ? "'" + address.zip : '',
+      safeText_(address.city), COUNTRY_NAMES_IT[address.country]
+    ] : ['', '', '', '', '']]);
 
     var log = ss.getSheetByName(SHEET_LOG) || getOrCreateSheet_(ss, SHEET_LOG, LOG_HEADERS);
     log.appendRow([
       now, '', row ? 'Contatti aggiornati' : 'Nuovi contatti',
-      safeText_(JSON.stringify({ name: name, email: email, email2: email2, phones: phones, lang: lang }))
+      safeText_(JSON.stringify({ name: name, email: email, email2: email2, phones: phones, address: address, lang: lang }))
     ]);
     // mail di conferma solo agli indirizzi nuovi: chi cambia solo il cellulare non la riceve di nuovo
-    mail = confirmContact_(sheet, row || last + 1, { name: name, email: email, email2: email2, phones: phones, lang: lang }, log);
+    mail = confirmContact_(sheet, row || last + 1, { name: name, email: email, email2: email2, phones: phones, address: address, lang: lang }, log);
   } finally {
     lock.releaseLock();
   }
@@ -333,7 +367,7 @@ function getOrCreateContactsSheet_(ss) {
     sheet.setFrozenRows(1);
     sheet.setColumnWidth(1, 150).setColumnWidth(2, 200).setColumnWidth(3, 240).setColumnWidth(4, 240)
       .setColumnWidth(5, 170).setColumnWidth(6, 150)
-      .setColumnWidth(8, 130).setColumnWidth(9, 240).setColumnWidth(CONFIRM_COLUMN, 300);
+      .setColumnWidth(8, 130).setColumnWidth(9, 240);
   } else if (String(sheet.getRange(1, 4).getValue()) === 'Cellulare (WhatsApp)') {
     // scheda creata con la versione senza "Email 2": inserisce la colonna dopo "Email",
     // così i dati già presenti (e le vostre colonne) si spostano a destra senza mescolarsi
@@ -341,10 +375,11 @@ function getOrCreateContactsSheet_(ss) {
     sheet.getRange(1, 4).setValue('Email 2').setFontWeight('bold');
     sheet.setColumnWidth(4, 240);
   }
-  if (String(sheet.getRange(1, CONFIRM_COLUMN).getValue()) === '') {
-    // scheda creata prima delle mail di conferma
-    sheet.getRange(1, CONFIRM_COLUMN).setValue(CONTACT_HEADERS[CONFIRM_COLUMN - 1]).setFontWeight('bold');
-    sheet.setColumnWidth(CONFIRM_COLUMN, 300);
+  // colonne arrivate dopo (mail di conferma, indirizzo): se mancano, si aggiungono in fondo
+  for (var c = CONFIRM_COLUMN; c <= CONTACT_HEADERS.length; c++) {
+    if (String(sheet.getRange(1, c).getValue()) !== '') continue;
+    sheet.getRange(1, c).setValue(CONTACT_HEADERS[c - 1]).setFontWeight('bold');
+    sheet.setColumnWidth(c, c === CONFIRM_COLUMN ? 300 : c === ADDRESS_COLUMN + 2 ? 90 : 180);
   }
   if (sheet.getIndex() !== 1) {
     var active = ss.getActiveSheet();
@@ -374,7 +409,7 @@ var CONFIRM_TEXTS = {
     subject: 'Alice & Max · Abbiamo ricevuto i vostri contatti',
     hello: 'Ciao {name},',
     intro: 'grazie! Abbiamo ricevuto i vostri contatti:',
-    names: 'Nomi', email: 'Email', phones: 'Cellulari',
+    names: 'Nomi', email: 'Email', phones: 'Cellulari', address: 'Indirizzo',
     date: 'Segnatevi la data: domenica 19 settembre 2027 a Lerici (Golfo dei Poeti).',
     notRsvp: 'Questa mail non conferma la vostra presenza: nei prossimi mesi riceverete un invito personalizzato a questo indirizzo.',
     spam: 'Per essere sicuri di riceverlo, aggiungete questo indirizzo ai vostri contatti. Se avete trovato questa mail nello spam o nelle promozioni, segnatela come «Non è spam» o spostatela nella posta in arrivo.',
@@ -385,7 +420,7 @@ var CONFIRM_TEXTS = {
     subject: 'Alice & Max · Nous avons bien reçu vos coordonnées',
     hello: 'Bonjour {name},',
     intro: 'merci ! Nous avons bien reçu vos coordonnées :',
-    names: 'Noms', email: 'E-mail', phones: 'Portables',
+    names: 'Noms', email: 'E-mail', phones: 'Portables', address: 'Adresse',
     date: 'Notez la date : dimanche 19 septembre 2027 à Lerici (Golfe des Poètes).',
     notRsvp: 'Cet e-mail ne confirme pas votre présence : dans les prochains mois, vous recevrez une invitation personnalisée à cette adresse.',
     spam: 'Pour être sûrs de la recevoir, ajoutez cette adresse à vos contacts. Si vous avez trouvé cet e-mail dans les spams ou les promotions, marquez-le comme « Non spam » ou déplacez-le dans votre boîte de réception.',
@@ -396,7 +431,7 @@ var CONFIRM_TEXTS = {
     subject: "Alice & Max · We've received your details",
     hello: 'Hi {name},',
     intro: "thank you! We've received your details:",
-    names: 'Names', email: 'Email', phones: 'Mobiles',
+    names: 'Names', email: 'Email', phones: 'Mobiles', address: 'Address',
     date: 'Save the date: Sunday 19 September 2027 in Lerici (Gulf of Poets).',
     notRsvp: "This email doesn't confirm your attendance: in the coming months you'll receive a personal invitation at this address.",
     spam: "To make sure you get it, add this address to your contacts. If you found this email in spam or promotions, mark it as \"Not spam\" or move it to your inbox.",
@@ -454,18 +489,24 @@ function confirmMessage_(to, cc, contact) {
   var emails = [contact.email, contact.email2].filter(String).join(', ');
   var phones = contact.phones.join(', ');
   var hello = T.hello.replace('{name}', contact.name);
+  var rows = [[T.names, contact.name], [T.email, emails], [T.phones, phones]];
+  var a = contact.address;
+  if (a) {
+    rows.push([T.address, [a.street, a.street2, (a.zip + ' ' + a.city).trim(), countryName_(a.country, contact.lang)]
+      .filter(String).join(', ')]);
+  }
 
   var body = [
-    hello, '', T.intro, '',
-    T.names + ': ' + contact.name, T.email + ': ' + emails, T.phones + ': ' + phones, '',
+    hello, '', T.intro, ''
+  ].concat(rows.map(function (r) { return r[0] + ': ' + r[1]; })).concat(['',
     T.date, '', T.notRsvp, '', T.spam, '', T.fix, SITE_URL, '', T.bye, 'Alice & Max'
-  ].join('\n');
+  ]).join('\n');
 
   var p = function (s) { return '<p style="margin:0 0 14px">' + s + '</p>'; };
   var html = '<div style="font-family:Georgia,serif;font-size:16px;line-height:1.5;color:#1f3a5f;max-width:560px">' +
     p(escapeHtml_(hello)) + p(escapeHtml_(T.intro)) +
     '<table style="margin:0 0 14px;border-collapse:collapse">' +
-    [[T.names, contact.name], [T.email, emails], [T.phones, phones]].map(function (r) {
+    rows.map(function (r) {
       return '<tr><td style="padding:2px 16px 2px 0;color:#5b6b80">' + escapeHtml_(r[0]) + '</td><td style="color:#1f3a5f">' + escapeHtml_(r[1]) + '</td></tr>';
     }).join('') + '</table>' +
     p('<strong>' + escapeHtml_(T.date) + '</strong>') + p(escapeHtml_(T.notRsvp)) + p(escapeHtml_(T.spam)) +
@@ -475,6 +516,15 @@ function confirmMessage_(to, cc, contact) {
   var message = { to: to.join(','), name: CONFIRM_SENDER_NAME, subject: T.subject, body: body, htmlBody: html };
   if (cc) message.cc = cc;
   return message;
+}
+
+// Il nome del paese nella lingua della mail (se Google non lo sa tradurre, in italiano)
+function countryName_(code, lang) {
+  try {
+    var name = new Intl.DisplayNames([lang], { type: 'region' }).of(code);
+    if (name && name !== code) return name;
+  } catch (err) {}
+  return COUNTRY_NAMES_IT[code] || code;
 }
 
 function escapeHtml_(s) {
@@ -499,7 +549,9 @@ function runMissingConfirmations_(ss) {
   var sheet = getOrCreateContactsSheet_(ss);
   var log = ss.getSheetByName(SHEET_LOG) || getOrCreateSheet_(ss, SHEET_LOG, LOG_HEADERS);
   var count = lastDataRow_(sheet, CONTACT_SCRIPT_COLUMNS) - 1;
-  var rows = count > 0 ? sheet.getRange(2, 1, count, CONTACT_SCRIPT_COLUMNS).getValues() : [];
+  var rows = count > 0 ? sheet.getRange(2, 1, count, CONTACT_HEADERS.length).getValues() : [];
+  var codeOf = {};
+  Object.keys(COUNTRY_NAMES_IT).forEach(function (k) { codeOf[COUNTRY_NAMES_IT[k]] = k; });
   var sent = 0, pending = 0;
   rows.forEach(function (r, i) {
     var clean = function (v) { return String(v).replace(/^'/, '').trim(); };
@@ -508,7 +560,10 @@ function runMissingConfirmations_(ss) {
     var lang = clean(r[6]);
     var result = confirmContact_(sheet, i + 2, {
       name: clean(r[1]), email: email, email2: clean(r[3]),
-      phones: [clean(r[4]), clean(r[5])].filter(String), lang: LANGS.indexOf(lang) > -1 ? lang : 'it'
+      phones: [clean(r[4]), clean(r[5])].filter(String), lang: LANGS.indexOf(lang) > -1 ? lang : 'it',
+      address: clean(r[10]) ? {
+        street: clean(r[10]), street2: clean(r[11]), zip: clean(r[12]), city: clean(r[13]), country: codeOf[clean(r[14])] || clean(r[14])
+      } : null
     }, log);
     if (result === 'sent') sent++;
     if (result === 'pending') pending++;
@@ -524,7 +579,8 @@ function sendTestConfirmations() {
   var me = Session.getEffectiveUser().getEmail();
   LANGS.forEach(function (lang) {
     MailApp.sendEmail(confirmMessage_([me], '', {
-      name: 'Vanessa e Marco Rossi', email: me, email2: '', phones: ['+393331234567'], lang: lang
+      name: 'Vanessa e Marco Rossi', email: me, email2: '', phones: ['+393331234567'], lang: lang,
+      address: { street: 'Via dei Limoni 1', street2: '', zip: '19032', city: 'Lerici', country: 'IT' }
     }));
   });
   SpreadsheetApp.getUi().alert('Mandate 3 mail di prova (italiano, francese, inglese) a ' + me + '.\n\n' +

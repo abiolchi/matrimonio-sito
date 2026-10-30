@@ -2,7 +2,7 @@
    Logica della pagina "Save the date": cambio lingua + modulo contatti
 
    1. l'ospite scrive nomi, email e cellulare (più una seconda email e un secondo
-      cellulare facoltativi, per l'altra persona della coppia)
+      cellulare facoltativi, per l'altra persona della coppia, e l'indirizzo di casa facoltativo)
    2. i numeri vengono controllati e salvati in formato internazionale (+32470123456)
    3. invio al Google Sheet (scheda "Contatti"), oppure finto invio in modalità di prova
    4. "Grazie" con il riepilogo di cosa è stato salvato; i dati restano anche in questo
@@ -46,6 +46,7 @@
     });
     try { localStorage.setItem("lang", lang); } catch (e) {}
 
+    fillCountries();
     followLang();
     render();
   }
@@ -132,10 +133,14 @@
   function resetSelects() {
     touched = { "1": false, "2": false };
     PHONES.forEach(function (n) { $("cc" + n).value = startCountry(); });
+    countryTouched = false;
+    $("country").value = LANG_HOME[current];
   }
 
   // cambiando lingua, il prefisso cambia solo se l'ospite non l'ha scelto e non ha ancora scritto il numero
+  // (lo stesso per il paese dell'indirizzo)
   function followLang() {
+    if (!countryTouched && !addressStarted()) $("country").value = LANG_HOME[current];
     if (touched["1"] || $("phone1").value.trim() || !$("cc1").options.length) return;
     $("cc1").value = startCountry();
     followFirst();
@@ -161,11 +166,61 @@
   });
 
   /* =========================================================
+     Indirizzo di casa (facoltativo): paesi europei + Regno Unito
+     ========================================================= */
+
+  // Formato del CAP di ogni paese (in maiuscolo, con gli spazi ridotti a uno).
+  // I codici sono quelli ISO: gli stessi di COUNTRY_NAMES_IT in apps-script/Code.gs.
+  var ZIP_FORMATS = {
+    AD: /^AD ?\d{3}$/, AT: /^\d{4}$/, BE: /^\d{4}$/, BG: /^\d{4}$/, CH: /^\d{4}$/, CY: /^\d{4}$/,
+    CZ: /^\d{3} ?\d{2}$/, DE: /^\d{5}$/, DK: /^\d{4}$/, EE: /^\d{5}$/, ES: /^\d{5}$/, FI: /^\d{5}$/,
+    FR: /^\d{5}$/, GB: /^[A-Z]{1,2}\d[A-Z\d]? ?\d[A-Z]{2}$/, GR: /^\d{3} ?\d{2}$/, HR: /^\d{5}$/,
+    HU: /^\d{4}$/, IE: /^[A-Z]\d[\dW] ?[A-Z\d]{4}$/, IS: /^\d{3}$/, IT: /^\d{5}$/, LI: /^94\d{2}$/,
+    LT: /^(LT-)?\d{5}$/, LU: /^(L-)?\d{4}$/, LV: /^(LV-)?\d{4}$/, MC: /^980\d{2}$/, MT: /^[A-Z]{3} ?\d{2,4}$/,
+    NL: /^\d{4} ?[A-Z]{2}$/, NO: /^\d{4}$/, PL: /^\d{2}-\d{3}$/, PT: /^\d{4}-\d{3}$/, RO: /^\d{6}$/,
+    SE: /^\d{3} ?\d{2}$/, SI: /^(SI-)?\d{4}$/, SK: /^\d{3} ?\d{2}$/, SM: /^4789\d$/, VA: /^00120$/
+  };
+  var ZIP_OPTIONAL = { IE: true }; // in Irlanda non tutti conoscono il proprio Eircode
+  var LANG_HOME = { it: "IT", fr: "BE", en: "GB" };
+  var ADDRESS_FIELDS = ["street", "street2", "zip", "city"];
+  var countryTouched = false;
+
+  function normZip(s) { return String(s || "").trim().toUpperCase().replace(/\s+/g, " "); }
+
+  function countryName(code) {
+    try { return new Intl.DisplayNames([current], { type: "region" }).of(code) || code; } catch (e) { return code; }
+  }
+
+  // il menu dei paesi, in ordine alfabetico nella lingua della pagina (tiene il paese scelto)
+  function fillCountries() {
+    var sel = $("country");
+    var keep = sel.value;
+    var codes = Object.keys(ZIP_FORMATS).sort(function (a, b) { return countryName(a).localeCompare(countryName(b), current); });
+    sel.textContent = "";
+    codes.forEach(function (code) {
+      var opt = document.createElement("option");
+      opt.value = code;
+      opt.textContent = countryName(code);
+      sel.appendChild(opt);
+    });
+    sel.value = keep || LANG_HOME[current];
+  }
+
+  function addressStarted() {
+    return ADDRESS_FIELDS.some(function (id) { return $(id).value.trim(); });
+  }
+
+  $("country").addEventListener("change", function () {
+    countryTouched = true;
+    if ($("zip").value.trim()) check("zip");
+  });
+
+  /* =========================================================
      Controllo dei campi
      ========================================================= */
 
   var EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
-  var FIELDS = ["name", "email", "phone1", "email2", "phone2"];
+  var FIELDS = ["name", "email", "phone1", "email2", "phone2", "street", "zip", "city"];
 
   function setError(id, key) {
     var input = $(id), err = $(id + "-error");
@@ -190,6 +245,13 @@
       key = !value ? "errEmailEmpty" : EMAIL_RE.test(value) ? null : "errEmail";
     } else if (id === "email2") {
       key = !value || EMAIL_RE.test(value) ? null : "errEmail"; // facoltativa
+    } else if (id === "street" || id === "city") {
+      // l'indirizzo è facoltativo: si controlla solo se l'ospite ha cominciato a scriverlo
+      key = value || !addressStarted() ? null : id === "street" ? "errStreet" : "errCity";
+    } else if (id === "zip") {
+      var country = $("country").value;
+      key = !value ? (addressStarted() && !ZIP_OPTIONAL[country] ? "errZip" : null)
+        : ZIP_FORMATS[country] && !ZIP_FORMATS[country].test(normZip(value)) ? "errZipFormat" : null;
     } else {
       var n = id.slice(-1);
       var r = parsePhone(value, $("cc" + n).value);
@@ -280,7 +342,7 @@
     try { localStorage.setItem(STORE_KEY, JSON.stringify(s)); } catch (e) {}
   }
 
-  var saved = loadSaved(); // { name, email, email2, phones: [{ cc, number, value }], savedAt }
+  var saved = loadSaved(); // { name, email, email2, phones: [{ cc, number, value }], address: { street, street2, zip, city, country } | null, savedAt }
   var view = "form";       // "form" | "thanks" (appena inviato) | "saved" (visita successiva)
 
   function show(next) {
@@ -307,6 +369,14 @@
       if (BY_ID[p.cc]) setCountry(n, p.cc);
       $("phone" + n).value = p.number;
     });
+    var a = saved.address;
+    if (a) {
+      $("street").value = a.street;
+      $("street2").value = a.street2 || "";
+      $("zip").value = a.zip;
+      $("city").value = a.city;
+      if (ZIP_FORMATS[a.country]) { $("country").value = a.country; countryTouched = true; }
+    }
   }
 
   // Dà il cursore a un elemento e lo porta a metà schermo: lasciato in cima,
@@ -346,7 +416,11 @@
     var email = $("email").value.trim();
     var email2 = $("email2").value.trim();
     if (email2.toLowerCase() === email.toLowerCase()) email2 = ""; // la stessa email due volte: basta una
-    var payload = { action: "contact", name: name, email: email, email2: email2, phones: phones, lang: current, website: $("website").value };
+    var address = addressStarted() ? {
+      street: $("street").value.trim(), street2: $("street2").value.trim(),
+      zip: normZip($("zip").value), city: $("city").value.trim(), country: $("country").value
+    } : null;
+    var payload = { action: "contact", name: name, email: email, email2: email2, phones: phones, address: address, lang: current, website: $("website").value };
     // se da questo dispositivo era già stata mandata un'altra email, il foglio aggiorna quella riga
     if (saved && saved.email.toLowerCase() !== email.toLowerCase()) payload.previousEmail = saved.email;
 
@@ -357,7 +431,7 @@
     api.save(payload)
       .then(function (res) {
         if (res && res.ok) {
-          saved = { name: name, email: email, email2: email2, phones: entered, savedAt: new Date().toISOString() };
+          saved = { name: name, email: email, email2: email2, phones: entered, address: address, savedAt: new Date().toISOString() };
           storeSaved(saved);
           show("thanks");
           focusInView($("thanks-title"));
@@ -408,6 +482,9 @@
     $("sum-names").textContent = saved.name;
     fillLines($("sum-email"), savedEmails());
     fillLines($("sum-phones"), saved.phones.map(function (p) { return prettyPhone(p.value); }));
+    var a = saved.address;
+    $("sum-address-row").hidden = !a;
+    if (a) fillLines($("sum-address"), [a.street, a.street2, (a.zip + " " + a.city).trim(), countryName(a.country)].filter(Boolean));
   }
 
   /* =========================================================

@@ -163,6 +163,40 @@
               </div>
             </fieldset>
 
+            <!-- indirizzo di casa: tutto facoltativo, ma chi comincia scrive via, CAP e città -->
+            <fieldset class="optional">
+              <legend data-i18n="addrLegend">Indirizzo di casa (facoltativo)</legend>
+
+              <div class="field">
+                <label for="street" data-i18n="streetLabel">Via e numero civico</label>
+                <input id="street" name="street" type="text" maxlength="150" autocomplete="address-line1" aria-describedby="street-error">
+                <div id="street-error" class="error" role="alert" hidden></div>
+              </div>
+
+              <div class="field">
+                <label for="street2" data-i18n="street2Label">Scala, interno, presso… (facoltativo)</label>
+                <input id="street2" name="street2" type="text" maxlength="150" autocomplete="address-line2">
+              </div>
+
+              <div class="addr-row">
+                <div class="field addr-zip">
+                  <label for="zip" data-i18n="zipLabel">CAP</label>
+                  <input id="zip" name="zip" type="text" maxlength="12" autocomplete="postal-code" spellcheck="false" aria-describedby="zip-error">
+                </div>
+                <div class="field addr-city">
+                  <label for="city" data-i18n="cityLabel">Città</label>
+                  <input id="city" name="city" type="text" maxlength="100" autocomplete="address-level2" aria-describedby="city-error">
+                </div>
+              </div>
+              <div id="zip-error" class="error" role="alert" hidden></div>
+              <div id="city-error" class="error" role="alert" hidden></div>
+
+              <div class="field">
+                <label for="country" data-i18n="countryLabel">Paese</label>
+                <select id="country" class="country" autocomplete="country"></select>
+              </div>
+            </fieldset>
+
             <p class="help privacy" data-i18n="privacy">Useremo questi dati solo per organizzare il matrimonio.</p>
 
             <div class="std-actions">
@@ -187,6 +221,7 @@
               <div><dt data-i18n="sumNames">Nomi</dt><dd id="sum-names"></dd></div>
               <div><dt data-i18n="sumEmail">Email</dt><dd id="sum-email"></dd></div>
               <div><dt data-i18n="sumPhones">Cellulari</dt><dd id="sum-phones"></dd></div>
+              <div id="sum-address-row" hidden><dt data-i18n="sumAddress">Indirizzo</dt><dd id="sum-address"></dd></div>
             </dl>
           </div>
           <p class="help" data-i18n="editHint">Qualcosa non va? Potete correggere i dati quando volete.</p>
