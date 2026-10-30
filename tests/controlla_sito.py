@@ -278,6 +278,7 @@ def form_checks(browser):
           and payload.get("phones") == ["+393331234567", "+32470123456"] and payload.get("website") == "",
           "invio completo: dati giusti nel formato giusto")
     check("marco@example.com" in page.inner_text("#thanks-body"), "grazie: mostra anche la seconda email")
+    check(page.is_visible(".mail-hint") and "spam" in page.inner_text(".mail-hint"), "grazie: avvisa della mail di conferma e dello spam")
 
     page.reload()
     page.wait_for_load_state("load")
@@ -376,6 +377,7 @@ window.makeSpreadsheet = function (tabs) {
     S.getIndex = () => Object.keys(sheets).indexOf(name) + 1;
     S.getLastRow = () => { for (let r = S.data.length; r >= 1; r--) if ((S.data[r - 1] || []).some(v => v !== '' && v != null)) return r; return 0; };
     S.setFrozenRows = () => S; S.setColumnWidth = () => S; S.insertColumnAfter = () => S;
+    S.appendRow = r => { S.data.splice(S.getLastRow(), 0, r.slice()); return S; };
     S.getRange = (r, c, nr = 1, nc = 1) => {
       const R = {
         getValue: () => get(r, c),
@@ -404,6 +406,16 @@ window.makeSpreadsheet = function (tabs) {
   };
   window.SpreadsheetApp = { getActive: () => ss, getUi: () => ({ alert: m => { window.lastAlert = m; } }) };
   window.LockService = { getScriptLock: () => ({ waitLock() {}, releaseLock() {} }) };
+  const cache = {};
+  window.CacheService = { getScriptCache: () => ({ get: k => cache[k] || null, put: (k, v) => { cache[k] = v; } }) };
+  // Gmail finto: niente parte davvero, le mail restano in window.mails
+  window.mails = [];
+  window.mailQuota = 100;
+  window.MailApp = {
+    getRemainingDailyQuota: () => window.mailQuota,
+    sendEmail: m => { window.mails.push(m); window.mailQuota -= m.to.split(',').length + (m.cc ? 1 : 0); }
+  };
+  window.Session = { getEffectiveUser: () => ({ getEmail: () => 'alice@example.com' }) };
   return ss;
 };
 """
@@ -457,6 +469,76 @@ def sheet_checks(browser):
     page.close()
 
 
+def mail_checks(browser):
+    section("Mail di conferma (Gmail finto)")
+    page = browser.new_page()
+    page.set_content("<!doctype html><title>t</title>")
+    page.add_script_tag(content=(ROOT / "apps-script/Code.gs").read_text(encoding="utf-8"))
+    page.add_script_tag(content=FAKE_SHEETS_JS)
+    r = page.evaluate("""() => {
+        const old = CONTACT_HEADERS.slice(0, 9);   // scheda creata prima delle mail di conferma
+        const ss = makeSpreadsheet({ Contatti: [old], Storico: [LOG_HEADERS] });
+        const C = ss.sheets.Contatti;
+        const send = d => saveContact_(Object.assign({ phones: ['+393331234567'], lang: 'fr', website: '' }, d));
+        const out = {};
+
+        out.first = send({ name: 'Vanessa <b>Rossi</b>', email: 'v@x.it', email2: 'm@x.it' });
+        out.header = C.data[0][CONFIRM_COLUMN - 1];
+        out.mail = mails[0] || {};
+        out.cell1 = C.data[1][CONFIRM_COLUMN - 1];
+
+        out.samePhone = send({ name: 'Vanessa Rossi', email: 'v@x.it', email2: 'm@x.it', phones: ['+393339999999'] });
+        out.count2 = mails.length;
+
+        out.changed = send({ name: 'Vanessa Rossi', email: 'vanessa@x.it', email2: 'm@x.it', previousEmail: 'v@x.it' });
+        out.changedTo = (mails[1] || {}).to;
+        out.cell3 = C.data[1][CONFIRM_COLUMN - 1];
+        out.rows = C.getLastRow();
+
+        C.data[1][7] = 'LIMONE-4K7'; C.data[1][8] = 'nota nostra';
+        mailQuota = 1;  // Gmail ha finito il limite di oggi
+        out.noQuota = send({ name: 'Claire', email: 'c@x.fr', lang: 'xx' });
+        out.cell4 = C.data[2][CONFIRM_COLUMN - 1];
+        out.count4 = mails.length;
+
+        mailQuota = 100;
+        sendMissingConfirmations();
+        out.alert = lastAlert;
+        out.cell5 = C.data[2][CONFIRM_COLUMN - 1];
+        out.late = mails[mails.length - 1] || {};
+        out.ours = [C.data[1][7], C.data[1][8]];
+        sendMissingConfirmations();
+        out.alertAgain = lastAlert;
+
+        MailApp.sendEmail = () => { throw new Error('Autorizzazione richiesta'); };
+        out.broken = send({ name: 'Pinco', email: 'p@x.it' });
+        out.log = ss.sheets.Storico.data.map(r => r[2]).join(' | ');
+        return out;
+    }""")
+    m = r["mail"]
+    check(r["header"] == "Mail di conferma", "la scheda Contatti già esistente riceve la colonna «Mail di conferma»")
+    check(r["first"].get("mail") == "sent" and m.get("to") == "v@x.it,m@x.it" and m.get("cc") == "maxence.draguet@gmail.com",
+          "contatto nuovo: una mail a entrambe le email, con Max in copia")
+    check(m.get("name") == "Alice & Max" and "coordonnées" in m.get("subject", ""), "mittente «Alice & Max», testo nella lingua del sito (fr)")
+    check("&lt;b&gt;Rossi&lt;/b&gt;" in m.get("htmlBody", "") and "<b>Rossi" not in m.get("htmlBody", ""),
+          "nella mail i nomi scritti dagli ospiti non diventano HTML")
+    check("spam" in m.get("body", "") and "alicemaxlerici.it" in m.get("body", ""), "la mail parla dello spam e porta al sito")
+    check(r["cell1"] == "✓ v@x.it, m@x.it", "nel foglio: a chi è partita la mail")
+    check(r["samePhone"].get("mail") == "none" and r["count2"] == 1, "cambia solo il cellulare: nessuna mail nuova")
+    check(r["changedTo"] == "vanessa@x.it" and r["rows"] == 2, "cambia l'email: mail solo al nuovo indirizzo, stessa riga")
+    check(r["cell3"] == "✓ vanessa@x.it, m@x.it", "dopo il cambio la cella elenca gli indirizzi attuali")
+    check(r["noQuota"].get("ok") and r["noQuota"].get("mail") == "pending" and r["count4"] == 2 and r["cell4"] == "⏳ da inviare",
+          "limite di Gmail finito: il contatto è salvato, la mail resta ⏳ da inviare")
+    check(r["cell5"] == "✓ c@x.fr" and r["late"].get("to") == "c@x.fr" and "Mandate 1" in r["alert"],
+          "menu «Invia le mail di conferma mancanti»: manda quella rimasta")
+    check("Ciao" in r["late"].get("body", ""), "lingua sconosciuta: mail in italiano")
+    check(r["ours"] == ["LIMONE-4K7", "nota nostra"], "le colonne «Codice invito» e «Note» restano vostre")
+    check("Nessuna" in r["alertAgain"], "rilanciando il menu non parte niente due volte")
+    check(r["broken"].get("ok") and r["broken"].get("mail") == "pending" and "non partita" in r["log"],
+          "Gmail dà errore: il contatto è salvato, l'errore finisce nello Storico")
+    page.close()
+
+
 # =========================================================
 
 def run(part, *args):
@@ -471,7 +553,7 @@ def main():
     run(static_checks)
     with sync_playwright() as p:
         browser = p.chromium.launch()
-        for part in (translation_checks, page_checks, form_checks, rsvp_checks, apps_script_checks, sheet_checks):
+        for part in (translation_checks, page_checks, form_checks, rsvp_checks, apps_script_checks, sheet_checks, mail_checks):
             run(part, browser)
         browser.close()
 
